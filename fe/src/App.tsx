@@ -10,7 +10,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Layout />}>
-        {/* <Route index element={<Dashboard />}/> */}
+        <Route index element={<Dashboard />}/>
         </Route>
       </Routes>
     </BrowserRouter>

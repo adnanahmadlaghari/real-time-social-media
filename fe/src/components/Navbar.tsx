@@ -11,13 +11,8 @@ import { StyledInputBase } from './Search/StyledInputBase';
 
 
 
-interface NavbarProps {
-  onToggleSidebar: () => void;
-}
 
-
-
- const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar }) => {
+ const Navbar = () => {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
@@ -28,7 +23,6 @@ interface NavbarProps {
             color="inherit"
             aria-label="open drawer"
             sx={{ mr: 2 }}
-            onClick={onToggleSidebar}
           >
             <MenuIcon />
           </IconButton>
