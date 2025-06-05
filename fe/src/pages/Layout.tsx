@@ -1,14 +1,18 @@
 import { Outlet } from 'react-router-dom'
-import { Box } from '@mui/material'
+import { Grid, Stack } from '@mui/material'
 import Navbar from '../components/Navbar'
 
-const Layout = () => {
+const Layout: React.FC = () => {
 
   return (
-    <Box sx={{ display: 'flex', height: '100vh' }}>
-        <Navbar />
+    <Grid>
+      <Navbar />
+
+      <Stack direction={"row"}>
         <Outlet />
-    </Box>
+      </Stack>
+
+    </Grid>
 
   )
 }
