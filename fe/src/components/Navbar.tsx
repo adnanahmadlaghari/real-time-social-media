@@ -6,6 +6,8 @@ import SearchIcon from '@mui/icons-material/Search';
 import Search from './Search/Search';
 import { SearchIconWrapper } from './Search/SearchIconWrapper';
 import { StyledInputBase } from './Search/StyledInputBase';
+import { Avatar, Stack } from '@mui/material';
+import BasicSelect from './Select';
 
 
 
@@ -20,9 +22,14 @@ import { StyledInputBase } from './Search/StyledInputBase';
             component="div"
             sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
           >
-            MUI
+           Sauran
           </Typography>
-          <Search>
+          <Stack sx={{ display: { xs: 'none', sm: 'block' } }}>
+          <BasicSelect />
+          </Stack>
+          <Stack spacing={2} direction={"row"}>
+            <Stack sx={{ flexGrow: 1, alignItems: "center" }}>
+              <Search>
             <SearchIconWrapper>
               <SearchIcon />
             </SearchIconWrapper>
@@ -31,6 +38,11 @@ import { StyledInputBase } from './Search/StyledInputBase';
               inputProps={{ 'aria-label': 'search' }}
             />
           </Search>
+            </Stack>
+          <Stack sx={{display: { xs: 'none', sm: 'block' } }}>
+            <Avatar /> 
+          </Stack>
+          </Stack>
         </Toolbar>
       </AppBar>
     </Box>
