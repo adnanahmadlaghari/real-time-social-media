@@ -1,16 +1,16 @@
 import { Outlet } from 'react-router-dom'
-import { Grid } from '@mui/material'
+import { Box} from '@mui/material'
 import Navbar from '../components/Navbar'
 import CollapsibleSidebar from '../components/Sidebar'
 
 const Layout: React.FC = () => {
 
   return (
-    <Grid>
+    <Box>
       <Navbar />
       <Outlet />
       <CollapsibleSidebar />
-    </Grid>
+    </Box>
 
   )
 }

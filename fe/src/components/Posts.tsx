@@ -1,38 +1,54 @@
-import Card from '@mui/material/Card';
-import CardHeader from '@mui/material/CardHeader';
-import CardMedia from '@mui/material/CardMedia';
-import CardContent from '@mui/material/CardContent';
-import Avatar from '@mui/material/Avatar';
-import Typography from '@mui/material/Typography';
-import { red } from '@mui/material/colors';
+import { Grid } from "@mui/material";
+import PostCard from "./Card";
 
+
+export const posting = [
+    {
+        title: "this is title",
+        content: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Facilis iste, reprehenderit praesentium nesciunt eos quod eius voluptates, enim obcaecati natus culpa? Explicabo vero tempore ipsum id? Voluptatum, soluta accusamus illo, sed nam sint voluptatem odio quaerat repellat amet error dolor obcaecati minima aut, reiciendis voluptate. Impedit id dignissimos cum facere, fugit consectetur doloremque voluptate dolores esse accusamus placeat hic odio!",
+        img: "https://www.famousbirthdays.com/faces/kaya-hazal-image.jpg",
+        name: "Adnan Ahmad",
+        Date: Date.now()
+    },
+    {
+        title: "this is title",
+        content: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Facilis iste, reprehenderit praesentium nesciunt eos quod eius voluptates, enim obcaecati natus culpa? Explicabo vero tempore ipsum id? Voluptatum, soluta accusamus illo, sed nam sint voluptatem odio quaerat repellat amet error dolor obcaecati minima aut, reiciendis voluptate. Impedit id dignissimos cum facere, fugit consectetur doloremque voluptate dolores esse accusamus placeat hic odio!",
+        img: "https://www.famousbirthdays.com/faces/kaya-hazal-image.jpg",
+        name: "Adnan Ahmad",
+        Date: Date.now()
+    },
+    {
+        title: "this is title",
+        content: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Facilis iste, reprehenderit praesentium nesciunt eos quod eius voluptates, enim obcaecati natus culpa? Explicabo vero tempore ipsum id? Voluptatum, soluta accusamus illo, sed nam sint voluptatem odio quaerat repellat amet error dolor obcaecati minima aut, reiciendis voluptate. Impedit id dignissimos cum facere, fugit consectetur doloremque voluptate dolores esse accusamus placeat hic odio!",
+        img: "https://www.famousbirthdays.com/faces/kaya-hazal-image.jpg",
+        name: "Adnan Ahmad",
+        Date: Date.now()
+    },
+    {
+        title: "this is title",
+        content: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Facilis iste, reprehenderit praesentium nesciunt eos quod eius voluptates, enim obcaecati natus culpa? Explicabo vero tempore ipsum id? Voluptatum, soluta accusamus illo, sed nam sint voluptatem odio quaerat repellat amet error dolor obcaecati minima aut, reiciendis voluptate. Impedit id dignissimos cum facere, fugit consectetur doloremque voluptate dolores esse accusamus placeat hic odio!",
+        img: "https://www.famousbirthdays.com/faces/kaya-hazal-image.jpg",
+        name: "Adnan Ahmad",
+        Date: Date.now()
+    },
+    {
+        title: "this is title",
+        content: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Facilis iste, reprehenderit praesentium nesciunt eos quod eius voluptates, enim obcaecati natus culpa? Explicabo vero tempore ipsum id? Voluptatum, soluta accusamus illo, sed nam sint voluptatem odio quaerat repellat amet error dolor obcaecati minima aut, reiciendis voluptate. Impedit id dignissimos cum facere, fugit consectetur doloremque voluptate dolores esse accusamus placeat hic odio!", 
+        img: "https://www.famousbirthdays.com/faces/kaya-hazal-image.jpg",
+        name: "Adnan Ahmad",
+        Date: Date.now()
+    },
+]
 const Posts: React.FC = () => {
 
   return (
-    <Card sx={{maxWidth: 500, m: 2,}}>
-      <CardHeader
-        avatar={
-          <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
-            R
-          </Avatar>
-        }
-        title="Shrimp and Chorizo Paella"
-        subheader="September 14, 2016"
-      />
-      <CardMedia
-        component="img"
-        image="https://www.famousbirthdays.com/faces/kaya-hazal-image.jpg"
-        alt="Paella dish"
-        sx={{maxHeight:"400px"}}
-      />
-      <CardContent>
-        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-          This impressive paella is a perfect party dish and a fun meal to cook
-          together with your guests. Add 1 cup of frozen peas along with the mussels,
-          if you like.
-        </Typography>
-      </CardContent>
-      </Card>
+    <Grid>
+    {
+       posting.map((post, index) => {
+        return <PostCard key={index} {...post}/>
+       }) 
+    }
+    </Grid>
   );
 }
 

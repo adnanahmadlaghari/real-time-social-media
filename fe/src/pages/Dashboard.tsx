@@ -1,11 +1,11 @@
-import { Grid } from '@mui/material'
+import { Box } from '@mui/material'
 import Posts from '../components/Posts'
 
 const Dashboard: React.FC = () => {
   return (
-    <Grid>
+    <Box>
       <Posts />
-    </Grid>
+    </Box>
   )
 }
 
