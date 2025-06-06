@@ -85,10 +85,10 @@ import { useGlobalVar } from './Global/Global';
             />
           </Search>
           <Box sx={{ display: { xs: 'none', sm: 'block' }  }}>
-             <Button variant='text' color='white'>
+             <Button variant='text' >
               Dashboard
             </Button>
-            <Button variant='text' color='white'>
+            <Button variant='text'>
               Chat
             </Button>
 

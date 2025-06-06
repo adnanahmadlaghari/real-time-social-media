@@ -10,7 +10,6 @@ const Layout: React.FC = () => {
       <Navbar />
       <Outlet />
       <CollapsibleSidebar />
-
     </Grid>
 
   )

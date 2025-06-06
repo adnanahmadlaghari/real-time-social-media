@@ -1,14 +1,15 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom"
 import Layout from "./pages/Layout"
 import Dashboard from "./pages/Dashboard"
-import { Box } from "@mui/material"
+import { Box, useTheme } from "@mui/material"
 
 
 function App() {
 
+  const theme = useTheme()
 
   return (
-    <Box>
+    <Box sx={{bgcolor: theme.palette.background.default, color: theme.palette.text.primary, height: "100vh", width: "100vw"}}>
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Layout />}>
@@ -16,7 +17,7 @@ function App() {
         </Route>
       </Routes>
     </BrowserRouter>
-    </Box>
+    </Box >
   )
 }
 
