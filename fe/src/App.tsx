@@ -9,7 +9,7 @@ function App() {
   const theme = useTheme()
 
   return (
-    <Box sx={{bgcolor: theme.palette.background.default, color: theme.palette.text.primary, height: "100vh", width: "100vw"}}>
+    <Box sx={{bgcolor: theme.palette.background.default, color: theme.palette.text.primary, maxHeight: "100vh", width: "100vw", border: "3px solid red"}}>
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Layout />}>

@@ -16,7 +16,7 @@ interface CardProps {
 
 const PostCard: React.FC<CardProps> = ({title, content, img, name ,Date}) => {
   return (
-    <Card sx={{maxWidth: 500, m: 2,}}>
+    <Card sx={{maxWidth: 100, m: 2,}}>
       <CardHeader
         avatar={
           <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">

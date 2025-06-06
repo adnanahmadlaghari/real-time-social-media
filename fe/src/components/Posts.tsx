@@ -1,4 +1,4 @@
-import { Grid } from "@mui/material";
+import {Grid } from "@mui/material";
 import PostCard from "./Card";
 
 
@@ -42,7 +42,7 @@ export const posting = [
 const Posts: React.FC = () => {
 
   return (
-    <Grid>
+<Grid container spacing={2} padding={2}>
     {
        posting.map((post, index) => {
         return <PostCard key={index} {...post}/>
