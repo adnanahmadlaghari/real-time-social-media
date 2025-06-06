@@ -6,14 +6,10 @@ import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
 import { red } from '@mui/material/colors';
 
-
-
-
-
 const Posts: React.FC = () => {
 
   return (
-    <Card sx={{maxWidth: 500, m: 2}}>
+    <Card sx={{maxWidth: 500, m: 2,}}>
       <CardHeader
         avatar={
           <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
