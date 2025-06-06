@@ -17,6 +17,7 @@ import {
   BarChart as BarChartIcon,
   Layers as LayersIcon,
   Menu as MenuIcon,
+  ArrowBackIosNew,
 } from '@mui/icons-material';
 
 const drawerWidth = 240;
@@ -45,8 +46,8 @@ const navigationItems = [
   },
 ];
 
-export default function CustomSidebar() {
-  const [open, setOpen] = useState(false);
+const CustomSidebar = () => {
+  const [open, setOpen] = useState<boolean>(false);
 
 
   const toggleSidebar = () => {
@@ -71,7 +72,9 @@ export default function CustomSidebar() {
       >
         <Box sx={{ display: 'flex', justifyContent: open ? 'flex-end' : 'center', p: 1 }}>
           <IconButton onClick={toggleSidebar}>
-            <MenuIcon />
+            {
+              open ? <ArrowBackIosNew /> : <MenuIcon />  
+            }
           </IconButton>
         </Box>
 
@@ -116,3 +119,6 @@ export default function CustomSidebar() {
     </Box>
   );
 }
+
+
+export default CustomSidebar

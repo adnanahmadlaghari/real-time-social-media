@@ -18,7 +18,7 @@ import IOSSwitch from "./IOSSwitch"
 
 
 
-export default function PrimarySearchAppBar() {
+ const  PrimarySearchAppBar: React.FC = () => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
   const isMenuOpen = Boolean(anchorEl);
@@ -105,3 +105,5 @@ export default function PrimarySearchAppBar() {
     </Box>
   );
 }
+
+export default PrimarySearchAppBar
