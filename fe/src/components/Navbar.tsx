@@ -13,6 +13,7 @@ import { SearchIconWrapper } from './Search/SearchIconWrapper';
 import { StyledInputBase } from './Search/StyledInputBase';
 import { Button } from '@mui/material';
 import IOSSwitch from "./IOSSwitch"
+import { useGlobalVar } from './Global/Global';
 
 
 
@@ -20,6 +21,7 @@ import IOSSwitch from "./IOSSwitch"
 
  const  PrimarySearchAppBar: React.FC = () => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const {setTheme} = useGlobalVar()
 
   const isMenuOpen = Boolean(anchorEl);
 
@@ -32,6 +34,9 @@ import IOSSwitch from "./IOSSwitch"
     setAnchorEl(null);
   };
 
+  const toggleTheme = () => {
+    setTheme((prev) => prev === "light" ? "dark" : "light")
+  }
 
   const menuId = 'primary-search-account-menu';
   const renderMenu = (
@@ -86,7 +91,9 @@ import IOSSwitch from "./IOSSwitch"
             <Button variant='text' color='white'>
               Chat
             </Button>
-            <IOSSwitch />
+
+            <IOSSwitch onClick={toggleTheme}/>
+            
             <IconButton
               size="large"
               edge="end"
