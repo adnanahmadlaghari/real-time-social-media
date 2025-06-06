@@ -1,12 +1,14 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom"
 import Layout from "./pages/Layout"
 import Dashboard from "./pages/Dashboard"
+import { Box } from "@mui/material"
 
 
 function App() {
 
 
   return (
+    <Box>
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Layout />}>
@@ -14,6 +16,7 @@ function App() {
         </Route>
       </Routes>
     </BrowserRouter>
+    </Box>
   )
 }
 
