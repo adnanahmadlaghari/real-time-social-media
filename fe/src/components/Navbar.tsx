@@ -16,9 +16,6 @@ import IOSSwitch from "./IOSSwitch"
 import { useGlobalVar } from './Global/Global';
 
 
-
-
-
  const  PrimarySearchAppBar: React.FC = () => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const {setTheme} = useGlobalVar()

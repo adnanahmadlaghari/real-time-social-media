@@ -7,19 +7,24 @@ import Typography from '@mui/material/Typography';
 import { red } from '@mui/material/colors';
 
 interface CardProps {
+    id: number,
     title: string,
     content: string,
     img: string,
     name: string,
-    Date: number
+    Date: number,
+    handleClick?: (id: number) => void;
 }
 
-const PostCard: React.FC<CardProps> = ({title, content, img, name ,Date}) => {
+const PostCard: React.FC<CardProps> = ({id, title, content, img, name ,Date,handleClick}) => {
+
+
   return (
-    <Card sx={{maxWidth: 400, m: 2,}}>
-      <CardHeader
+    <>    
+    <Card sx={{maxWidth: 400, m: 2,}} onClick={() => {handleClick && handleClick(id)}}>
+      <CardHeader sx={{ cursor: 'pointer' }}
         avatar={
-          <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
+          <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe" >
             {img}
           </Avatar>
         }
@@ -44,6 +49,7 @@ const PostCard: React.FC<CardProps> = ({title, content, img, name ,Date}) => {
         </Typography>
       </CardContent>
       </Card>
+    </>
   )
 }
 
