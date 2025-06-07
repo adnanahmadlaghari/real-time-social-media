@@ -9,7 +9,14 @@ function App() {
   const theme = useTheme()
 
   return (
-    <Box sx={{bgcolor: theme.palette.background.default, color: theme.palette.text.primary, maxHeight: "100vh", width: "100vw", border: "3px solid red"}}>
+    <Box sx={{
+  bgcolor: theme.palette.background.default,
+  color: theme.palette.text.primary,
+  minHeight: "100vh", // Use minHeight instead of maxHeight
+  width: "100vw",
+  border: "3px solid red",
+  boxSizing: "border-box" // Prevents overflow from border
+}}>
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Layout />}>
