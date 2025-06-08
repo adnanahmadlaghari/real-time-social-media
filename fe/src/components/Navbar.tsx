@@ -11,15 +11,16 @@ import AccountCircle from '@mui/icons-material/AccountCircle';
 import Search from './Search/Search';
 import { SearchIconWrapper } from './Search/SearchIconWrapper';
 import { StyledInputBase } from './Search/StyledInputBase';
-import { Button } from '@mui/material';
+import { Button, Stack, useTheme } from '@mui/material';
 import IOSSwitch from "./IOSSwitch"
 import { useGlobalVar } from './Global/Global';
 
 
- const  PrimarySearchAppBar: React.FC = () => {
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const {setTheme} = useGlobalVar()
+const PrimarySearchAppBar: React.FC = () => {
 
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const { setTheme } = useGlobalVar()
+  const theme = useTheme()
   const isMenuOpen = Boolean(anchorEl);
 
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -60,7 +61,7 @@ import { useGlobalVar } from './Global/Global';
 
 
   return (
-    <Box sx={{ flexGrow: 1 , display: { xs: 'none', sm: 'block' }}}>
+    <Box sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}>
       <AppBar position="static">
         <Toolbar>
           <Typography
@@ -71,7 +72,7 @@ import { useGlobalVar } from './Global/Global';
           >
             Social
           </Typography>
-            <Box sx={{ flexGrow: 1 }} />
+          <Box sx={{ flexGrow: 1 }} />
           <Search>
             <SearchIconWrapper>
               <SearchIcon />
@@ -81,16 +82,16 @@ import { useGlobalVar } from './Global/Global';
               inputProps={{ 'aria-label': 'search' }}
             />
           </Search>
-          <Box sx={{ display: { xs: 'none', sm: 'block' }  }}>
-             <Button variant='text' >
+          <Stack sx={{ display: { xs: 'none', sm: 'block', marginLeft: 10 } }} spacing={1} direction="row" alignItems="center">
+            <Button variant={theme.palette.mode === "dark" ? "contained" : ""} color={theme.palette.mode === "dark" ? "secondary" : "primary"}>
               Dashboard
             </Button>
-            <Button variant='text'>
+            <Button variant={theme.palette.mode === "dark" ? "contained" : ""} color={theme.palette.mode === "dark" ? "secondary" : "primary"}>
               Chat
             </Button>
 
-            <IOSSwitch onClick={toggleTheme}/>
-            
+            <IOSSwitch onClick={toggleTheme} />
+
             <IconButton
               size="large"
               edge="end"
@@ -102,7 +103,7 @@ import { useGlobalVar } from './Global/Global';
             >
               <AccountCircle />
             </IconButton>
-          </Box>
+          </Stack>
         </Toolbar>
       </AppBar>
       {renderMenu}
