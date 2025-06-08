@@ -7,50 +7,70 @@ import Typography from '@mui/material/Typography';
 import { red } from '@mui/material/colors';
 
 interface CardProps {
-    id: number,
-    title: string,
-    content: string,
-    img: string,
-    name: string,
-    Date: number,
-    handleClick?: (id: number) => void;
+  id: number;
+  title: string;
+  content: string;
+  img: string;
+  name: string;
+  Date: number;
+  handleClick?: (id: number) => void;
 }
 
-const PostCard: React.FC<CardProps> = ({id, title, content, img, name ,Date,handleClick}) => {
-
-
+const PostCard: React.FC<CardProps> = ({
+  id,
+  title,
+  content,
+  img,
+  name,
+  Date,
+  handleClick,
+}) => {
   return (
-    <>    
-    <Card sx={{maxWidth: 400, m: 2,}} onClick={() => {handleClick && handleClick(id)}}>
-      <CardHeader sx={{ cursor: 'pointer' }}
+    <Card
+      sx={{
+        width: 600,
+        // margin: '24px auto',
+        boxShadow: 4,
+        borderRadius: 3,
+        transition: 'transform 0.3s ease',
+        '&:hover': {
+          transform: 'scale(1.02)',
+          cursor: handleClick ? 'pointer' : 'default',
+        },
+      }}
+      onClick={() => {
+        handleClick && handleClick(id);
+      }}
+    >
+      <CardHeader
         avatar={
-          <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe" >
-            {img}
+          <Avatar sx={{ bgcolor: red[500], width: 56, height: 56 }} aria-label="profile">
+            {name[0]}
           </Avatar>
         }
-        title={name}
-        subheader={Date}
+        title={<Typography variant="h6">{name}</Typography>}
+        subheader={<Typography variant="body2">{Date}</Typography>}
       />
+
       <CardMedia
         component="img"
+        height="600"
+        width={600}
         image={img}
-        alt="Paella dish"
-        sx={{maxHeight:"400px"}}
+        alt="Post image"
+        sx={{ objectFit: 'cover' }}
       />
-      
+
       <CardContent>
-        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+        <Typography variant="h5" gutterBottom>
           {title}
         </Typography>
-      </CardContent>
-      <CardContent>
-        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+        <Typography variant="body1" sx={{ color: 'text.secondary' }}>
           {content}
         </Typography>
       </CardContent>
-      </Card>
-    </>
-  )
-}
+    </Card>
+  );
+};
 
-export default PostCard
+export default PostCard;

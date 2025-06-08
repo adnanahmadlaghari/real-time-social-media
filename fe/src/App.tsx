@@ -13,7 +13,7 @@ function App() {
       bgcolor: theme.palette.background.default,
       color: theme.palette.text.primary,
       minHeight: "100vh",
-      width: "100vw",
+      maxWidth: "100vw",
       boxSizing: "border-box"
     }}>
       <BrowserRouter>

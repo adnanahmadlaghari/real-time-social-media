@@ -48,17 +48,21 @@ export const posting = [
 ]
 const Posts: React.FC = () => {
 
-    const [selectedUser, setSelectedUser] = useState<any | null>(null);
-
+    const [selectedUser, setSelectedUser] = useState<any | null>(() => {
+        const stored = localStorage.getItem("selectedUser");
+        return stored ? JSON.parse(stored) : null;
+    });
     const handleUserClick = (id: number) => {
         const user = posting.find((post) => post.id === id);
         if (user) {
             setSelectedUser(user);
+            localStorage.setItem("selectedUser", JSON.stringify(user));
         }
     };
 
     const handleBack = () => {
         setSelectedUser(null);
+        localStorage.removeItem("selectedUser");
     };
 
     return (
@@ -68,7 +72,7 @@ const Posts: React.FC = () => {
                 selectedUser ? (
                     <UserProfile id={selectedUser.id} onBack={handleBack} />
                 ) : (
-                    <Grid container spacing={2} padding={2}>
+                    <Grid container spacing={7}  wordWrap="wrap" justifyContent="center" alignItems="center" sx={{ p: 2 }}>
                         {
                             posting.map((post) => {
                                 return <Grid key={post.id}>

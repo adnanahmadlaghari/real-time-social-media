@@ -83,10 +83,10 @@ const PrimarySearchAppBar: React.FC = () => {
             />
           </Search>
           <Stack sx={{ display: { xs: 'none', sm: 'block', marginLeft: 10 } }} spacing={1} direction="row" alignItems="center">
-            <Button variant={theme.palette.mode === "dark" ? "contained" : ""} color={theme.palette.mode === "dark" ? "secondary" : "primary"}>
+            <Button variant={theme.palette.mode === "dark" ? "contained" : "text"} color={theme.palette.mode === "dark" ? "secondary" : "primary"}>
               Dashboard
             </Button>
-            <Button variant={theme.palette.mode === "dark" ? "contained" : ""} color={theme.palette.mode === "dark" ? "secondary" : "primary"}>
+            <Button variant={theme.palette.mode === "dark" ? "contained" : "text"} color={theme.palette.mode === "dark" ? "secondary" : "primary"}>
               Chat
             </Button>
 
