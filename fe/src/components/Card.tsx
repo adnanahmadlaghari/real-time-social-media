@@ -28,7 +28,7 @@ const PostCard: React.FC<CardProps> = ({
   return (
     <Card
       sx={{
-        width: 600,
+        width: { xs: '100%', sm: "100%", md: "100%", lg: 600 },
         // margin: '24px auto',
         boxShadow: 4,
         borderRadius: 3,
@@ -58,7 +58,7 @@ const PostCard: React.FC<CardProps> = ({
         width={600}
         image={img}
         alt="Post image"
-        sx={{ objectFit: 'cover' }}
+        sx={{ objectFit: 'cover', }}
       />
 
       <CardContent>

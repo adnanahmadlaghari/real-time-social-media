@@ -75,7 +75,7 @@ const Posts: React.FC = () => {
                     <Grid container spacing={7}  wordWrap="wrap" justifyContent="center" alignItems="center" sx={{ p: 2 }}>
                         {
                             posting.map((post) => {
-                                return <Grid key={post.id}>
+                                return <Grid key={post.id} item xs={12} sm={6} md={4} lg={3} xl={2} sx={{ display: 'flex', justifyContent: 'center' }}>
                                     <PostCard {...post} handleClick={handleUserClick} />
                                 </Grid>
                             })
