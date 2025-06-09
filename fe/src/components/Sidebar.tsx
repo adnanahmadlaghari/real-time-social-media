@@ -9,7 +9,6 @@ import {
   IconButton,
   Box,
   Tooltip,
-  Switch,
   useMediaQuery,
 } from '@mui/material';
 import {

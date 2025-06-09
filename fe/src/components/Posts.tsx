@@ -1,4 +1,4 @@
-import { Grid } from "@mui/material";
+import { Box, Grid } from "@mui/material";
 import PostCard from "./Card";
 import UserProfile from "./UserProfile";
 import { useState } from "react";
@@ -67,7 +67,7 @@ const Posts: React.FC = () => {
 
     return (
 
-        <>
+        <Box sx={{ width: '100vw', height: '100vh',}}>
             {
                 selectedUser ? (
                     <UserProfile id={selectedUser.id} onBack={handleBack} />
@@ -83,7 +83,7 @@ const Posts: React.FC = () => {
                     </Grid>
                 )
             }
-        </>
+        </Box>
 
     );
 }

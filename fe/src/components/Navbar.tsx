@@ -55,16 +55,16 @@ const PrimarySearchAppBar: React.FC = () => {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-      <MenuItem onClick={handleMenuClose}>LogOut</MenuItem>
+      <MenuItem onClick={() => { navigation("/profile"), setAnchorEl(null) }}>Profile</MenuItem>
+      <MenuItem >LogOut</MenuItem>
     </Menu>
   );
 
 
 
   return (
-    <Box sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}>
-      <AppBar position="static">
+    <AppBar position="static">
+      <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
         <Toolbar>
           <Typography
             variant="h6"
@@ -107,9 +107,9 @@ const PrimarySearchAppBar: React.FC = () => {
             </IconButton>
           </Stack>
         </Toolbar>
-      </AppBar>
-      {renderMenu}
-    </Box>
+        {renderMenu}
+      </Box>
+    </AppBar>
   );
 }
 

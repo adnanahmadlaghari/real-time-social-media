@@ -3,6 +3,7 @@ import Layout from "./pages/Layout"
 import Dashboard from "./pages/Dashboard"
 import { Box, useTheme } from "@mui/material"
 import Chat from "./pages/Chat"
+import Profile from "./pages/Profile"
 
 
 function App() {
@@ -13,8 +14,8 @@ function App() {
     <Box sx={{
       bgcolor: theme.palette.background.default,
       color: theme.palette.text.primary,
-      minHeight: "100vh",
-      maxWidth: "100vw",
+      height: "100vh",
+      width: "100vw",
       boxSizing: "border-box"
     }}>
       <BrowserRouter>
@@ -22,6 +23,7 @@ function App() {
           <Route path="/" element={<Layout />}>
             <Route index element={<Dashboard />} />
             <Route path="/chat" element={<Chat />} />
+            <Route path="/profile" element={<Profile />} />
           </Route>
         </Routes>
       </BrowserRouter>

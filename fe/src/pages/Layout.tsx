@@ -11,6 +11,7 @@ const Layout: React.FC = () => {
         display: "flex",
         flexDirection: "column",
         height: "100vh",
+        width: "100vw",
       }}
     >
       <Navbar />
