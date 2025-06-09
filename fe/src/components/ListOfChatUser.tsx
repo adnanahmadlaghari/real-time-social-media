@@ -10,8 +10,6 @@ const ListOfChatUser = () => {
         <Box
             // minHeight="100%"
             height={"100vh"}
-
-            border={"2px solid red"}
             width="300px"
             display="flex"
             alignItems="flex-start"

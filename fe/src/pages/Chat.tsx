@@ -10,7 +10,6 @@ const Chat = () => {
             sx={{
                 // flexGrow: 1,
                 height: "100%",
-                border: "2px solid blue",
                 overflow: "hidden",
                 display: "flex",
 

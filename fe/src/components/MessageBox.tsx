@@ -10,8 +10,7 @@ const MessageBox = () => {
             <Box>
                 <ChatHeader />
             </Box>
-
-            {/* Chat Messages (fills available space) */}
+            {/* Messages Area */}
             <Box sx={{ flexGrow: 1, overflowY: "auto" }}>
                 <ChatMessages />
             </Box>
