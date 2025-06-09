@@ -8,13 +8,16 @@ const ListOfChatUser = () => {
     const theme = useTheme();
     return (
         <Box
-            minHeight="100%"
+            // minHeight="100%"
+            height={"100vh"}
+
             border={"2px solid red"}
             width="300px"
             display="flex"
             alignItems="flex-start"
-            overflow={"hidden"}
-            p={2}
+            overflow={"scroll"}
+            // sx={{ height: "100%" }} 
+
         >
             {/* Sidebar/Chat List */}
             <Box

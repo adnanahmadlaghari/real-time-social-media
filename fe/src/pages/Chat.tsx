@@ -6,8 +6,13 @@ const Chat = () => {
 
     return (
         <Box
-            height="100vh"
-            width="100%"
+            sx={{
+                // flexGrow: 1,
+                height: "100%",
+                border: "2px solid blue",
+                overflow: "hidden",
+
+            }}
         >
             <ListOfChatUser />
         </Box>
