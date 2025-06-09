@@ -14,6 +14,7 @@ import { StyledInputBase } from './Search/StyledInputBase';
 import { Button, Stack, useTheme } from '@mui/material';
 import IOSSwitch from "./IOSSwitch"
 import { useGlobalVar } from './Global/Global';
+import { useNavigate } from 'react-router-dom';
 
 
 const PrimarySearchAppBar: React.FC = () => {
@@ -21,6 +22,7 @@ const PrimarySearchAppBar: React.FC = () => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const { setTheme } = useGlobalVar()
   const theme = useTheme()
+  const navigation = useNavigate()
   const isMenuOpen = Boolean(anchorEl);
 
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -83,10 +85,10 @@ const PrimarySearchAppBar: React.FC = () => {
             />
           </Search>
           <Stack sx={{ display: { xs: 'none', sm: 'block', marginLeft: 10 } }} spacing={1} direction="row" alignItems="center">
-            <Button variant={theme.palette.mode === "dark" ? "contained" : ""} color={theme.palette.mode === "dark" ? "secondary" : "primary"}>
+            <Button variant={theme.palette.mode === "dark" ? "contained" : ""} color={theme.palette.mode === "dark" ? "secondary" : "primary"} onClick={() => navigation("/")}>
               Dashboard
             </Button>
-            <Button variant={theme.palette.mode === "dark" ? "contained" : ""} color={theme.palette.mode === "dark" ? "secondary" : "primary"}>
+            <Button variant={theme.palette.mode === "dark" ? "contained" : ""} color={theme.palette.mode === "dark" ? "secondary" : "primary"} onClick={() => navigation("/chat")}>
               Chat
             </Button>
 

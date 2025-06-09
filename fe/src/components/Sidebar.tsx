@@ -14,22 +14,21 @@ import {
 } from '@mui/material';
 import {
   Dashboard as DashboardIcon,
-  ShoppingCart as ShoppingCartIcon,
-  BarChart as BarChartIcon,
   Layers as LayersIcon,
   Menu as MenuIcon,
   ArrowBackIosNew,
+  AccountCircle,
+  Chat,
 } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
 
 const drawerWidth = 240;
 
 const navigationItems = [
+  { title: 'Profile', icon: <AccountCircle /> },
   { title: 'Dashboard', icon: <DashboardIcon /> },
-  { title: 'Orders', icon: <ShoppingCartIcon /> },
-  { title: 'Reports', icon: <BarChartIcon /> },
+  { title: 'Chat', icon: <Chat /> },
   { title: 'Integrations', icon: <LayersIcon /> },
-  { title: 'Theme', icon: <Switch /> },
 ];
 
 const CustomSidebar: React.FC = () => {
