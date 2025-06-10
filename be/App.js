@@ -1,15 +1,27 @@
-const express = require('express');
+const express = require("express");
+const connectDB = require("./db/connect");
+
+const dotenv = require("dotenv");
+dotenv.config();
+
 const app = express();
 
 // Middleware or routes
 app.get("/", (req, res) => {
-    res.send("Hello world");    
+  res.send("Hello world");
 });
 
-// Define PORT as a constant
-const PORT = 5000;
+const Start = async () => {
+  try {
+    console.log("Server started");
+    await connectDB(process.env.MONGODB_URI);
+    app.listen(process.env.PORT, () => {
+      console.log(`Server is running on http://localhost:${process.env.PORT}`);
+    });
+  } catch (error) {
+    console.error("Error starting the server:", error);
+    process.exit(1);
+  }
+};
 
-// Start the server
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-});
+Start()
