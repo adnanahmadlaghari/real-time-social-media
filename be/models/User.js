@@ -19,8 +19,13 @@ const userSchema = new mongoose.Schema({
   profile: {
     type: String,
   },
-});
+}, {toJSON: {virtuals: true},toObject: {virtuals: true}});
 
+userSchema.virtual("tasks", {
+  ref: 'Task',
+  localField: '_id',
+  foreignField: 'author'
+})
 const User = mongoose.model("User", userSchema);
 
 module.exports = User;
