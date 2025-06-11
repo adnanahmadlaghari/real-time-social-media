@@ -3,6 +3,7 @@ const connectDB = require("./db/connect");
 const authRouter = require("./routes/Auth");
 
 const dotenv = require("dotenv");
+const userRoute = require("./routes/User");
 dotenv.config();
 
 const app = express();
@@ -11,6 +12,9 @@ const app = express();
 app.use(express.json());
 
 app.use("/auth", authRouter)
+
+app.use("/users", userRoute)
+
 // Middleware or routes
 app.get("/", (req, res) => {
   res.send("Hello world");
