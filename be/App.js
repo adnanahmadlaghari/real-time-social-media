@@ -1,19 +1,23 @@
 const express = require("express");
 const connectDB = require("./db/connect");
 const authRouter = require("./routes/Auth");
-
-const dotenv = require("dotenv");
 const userRoute = require("./routes/User");
+const passport = require("passport")
+require("./jwt/accessToken")
+const dotenv = require("dotenv");
 dotenv.config();
+
+
 
 const app = express();
 
 // Middleware to parse JSON data
 app.use(express.json());
+app.use(passport.initialize())
 
 app.use("/auth", authRouter)
 
-app.use("/users", userRoute)
+app.use("/users", passport.authenticate("jwt", {session: false}), userRoute)
 
 // Middleware or routes
 app.get("/", (req, res) => {
