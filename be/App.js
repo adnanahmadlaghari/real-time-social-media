@@ -1,15 +1,21 @@
 const express = require("express");
 const connectDB = require("./db/connect");
+const authRouter = require("./routes/Auth");
 
 const dotenv = require("dotenv");
 dotenv.config();
 
 const app = express();
 
+// Middleware to parse JSON data
+app.use(express.json());
+
+app.use("/auth", authRouter)
 // Middleware or routes
 app.get("/", (req, res) => {
   res.send("Hello world");
 });
+
 
 const Start = async () => {
   try {
