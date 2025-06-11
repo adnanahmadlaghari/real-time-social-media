@@ -1,9 +1,11 @@
 
 
 const express = require("express")
-const { getSingleUser } = require("../controller/User")
+const { getSingleUser, getAllUser } = require("../controller/User")
 
 const userRoute = express.Router()
+
+userRoute.route("/").get(getAllUser)
 
 userRoute.route("/:username").get(getSingleUser)
 

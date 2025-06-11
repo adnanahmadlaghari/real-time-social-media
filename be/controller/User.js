@@ -3,7 +3,7 @@ const User = require("../models/User")
 
 const getSingleUser = async (req, res) => {
   try {
-    
+
     const {username} = req.params
 
     const user = await User.findOne({username}).select("-password")
@@ -28,7 +28,22 @@ const getSingleUser = async (req, res) => {
   }
 };
 
-
+const getAllUser = async(req,res) => {
+    try {
+       const users = await User.find({}).select('-password')
+       res.status(200).json({
+        success: true,
+        users
+       }) 
+    } catch (error) {
+       res.status(500).json({
+      success: false,
+      error: error.message,
+      msg: "Internal Server Error",
+    }); 
+    }
+}
 module.exports = {
-    getSingleUser
+    getSingleUser,
+    getAllUser,
 }
