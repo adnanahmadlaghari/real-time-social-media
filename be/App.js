@@ -2,8 +2,11 @@ const express = require("express");
 const connectDB = require("./db/connect");
 const authRouter = require("./routes/Auth");
 const userRoute = require("./routes/User");
+
 const passport = require("passport")
+
 require("./jwt/accessToken")
+
 const dotenv = require("dotenv");
 dotenv.config();
 
