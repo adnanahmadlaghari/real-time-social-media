@@ -1,0 +1,100 @@
+const { Server } = require("socket.io");
+const jwt = require("jsonwebtoken");
+const Task = require("./models/Task");
+const User = require("./models/User");
+
+const setupSocket = (server) => {
+  const io = new Server(server, {
+    cors: {
+      origin: "*",
+      methods: ["GET", "POST", "PATCH", "DELETE"],
+    },
+  });
+
+  // Middleware to verify JWT
+  io.use(async (socket, next) => {
+    try {
+      const token = socket.handshake.auth.token;
+      if (!token) return next(new Error("Token missing"));
+
+      const decoded = jwt.verify(token, process.env.JWT_ACCESS_KEY);
+      const user = await User.findById(decoded.id);
+      if (!user) return next(new Error("User not found"));
+
+      socket.user = user; // Attach full user to socket
+      next();
+    } catch (err) {
+      console.error("Socket auth error:", err.message);
+      next(new Error("Authentication failed"));
+    }
+  });
+
+  io.on("connection", async (socket) => {
+    console.log("✅ User connected:", socket.user.username);
+
+    // Send all existing posts
+    const allPosts = await Task.find()
+      .populate("author", "username profile")
+      .sort({ createdAt: -1 });
+
+    socket.emit("all-posts", allPosts);
+
+    // Create Post
+    socket.on("create-post", async (payload, callback) => {
+      try {
+        const { title, content, media } = payload;
+
+        const newPost = await Task.create({
+          author: socket.user._id, // ✅ Set author from decoded token
+          title,
+          content,
+          media,
+        });
+
+        const populatedPost = await newPost.populate("author", "username profile");
+
+        io.emit("new-post", populatedPost); // ✅ Send to all users
+        callback?.({ success: true, post: populatedPost });
+      } catch (err) {
+        callback?.({ success: false, error: err.message });
+      }
+    });
+
+    socket.on("disconnect", () => {
+      console.log("❌ User disconnected:", socket.user.username);
+    });
+  });
+};
+
+module.exports = setupSocket;
+
+
+
+
+const socket = io("http://localhost:5000", {
+  auth: {
+    token: localStorage.getItem("accessToken"),
+  },
+});
+
+// Show all previous posts
+socket.on("all-posts", (posts) => {
+  console.log("All posts:", posts);
+});
+
+// Show new post as it arrives
+socket.on("new-post", (post) => {
+  console.log("New post:", post);
+});
+
+// Create post (no need to send author)
+socket.emit("create-post", {
+  title: "Hello World",
+  content: "This is my first post!",
+}, (response) => {
+  if (response.success) {
+    console.log("Post created!", response.post);
+  } else {
+    console.error("Post error:", response.error);
+  }
+});

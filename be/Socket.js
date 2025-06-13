@@ -9,6 +9,7 @@ const setupSocket = (server) => {
     },
   });
 
+
   const createPost = async(payload, callback) => {
    try {
    const {author, title, content} = payload
