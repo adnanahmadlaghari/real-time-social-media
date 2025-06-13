@@ -19,6 +19,7 @@ const setupSocket = (server) => {
       content
     })
     if(callback) callback({success: true, post})
+      console.log(post)
    } catch (error) {
      if(callback) callback({success: false, error: error.message})
    }
