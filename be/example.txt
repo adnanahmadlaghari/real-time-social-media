@@ -98,3 +98,62 @@ socket.emit("create-post", {
     console.error("Post error:", response.error);
   }
 });
+
+
+
+import React, { useEffect, useState } from "react";
+import socket from "./socket";
+
+const PostFeed = () => {
+  const [posts, setPosts] = useState([]);
+
+  useEffect(() => {
+    // Get all posts when component mounts
+    socket.emit("get-all-posts", (response) => {
+      if (response.success) {
+        setPosts(response.posts);
+      } else {
+        console.error("Error fetching posts:", response.error);
+      }
+    });
+
+    // Listen for new post
+    socket.on("new-post", (post) => {
+      setPosts(prev => [post, ...prev]); // add to top
+    });
+
+    // Listen for updated post
+    socket.on("updated-post", (updatedPost) => {
+      setPosts(prev =>
+        prev.map(p => (p._id === updatedPost._id ? updatedPost : p))
+      );
+    });
+
+    // Listen for deleted post
+    socket.on("deleted-post", (deletedId) => {
+      setPosts(prev => prev.filter(p => p._id !== deletedId));
+    });
+
+    // Cleanup listeners on unmount
+    return () => {
+      socket.off("new-post");
+      socket.off("updated-post");
+      socket.off("deleted-post");
+    };
+  }, []);
+
+  return (
+    <div>
+      <h2>Live Feed</h2>
+      {posts.map((post) => (
+        <div key={post._id} style={{ border: "1px solid #ccc", margin: "10px" }}>
+          <h3>{post.title}</h3>
+          <p>{post.content}</p>
+          <small>by {post.author?.username}</small>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+export default PostFeed;
