@@ -2,12 +2,13 @@ const express = require("express");
 const connectDB = require("./db/connect");
 const authRouter = require("./routes/Auth");
 const userRoute = require("./routes/User");
+const taskRoute = require("./routes/Task");
 const setupSocket = require("./Socket")
 const passport = require("passport")
 const dotenv = require("dotenv");
 dotenv.config();
 require("./jwt/accessToken")
-const http = require("http")
+const http = require("http");
 
 
 const app = express();
@@ -21,6 +22,7 @@ app.use(passport.initialize())
 app.use("/auth", authRouter)
 
 app.use("/users", passport.authenticate("jwt", {session: false}), userRoute)
+app.use("/tasks", passport.authenticate("jwt", {session: false}), taskRoute)
 
 
 
