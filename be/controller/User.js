@@ -47,7 +47,7 @@ const getAllUser = async (req, res) => {
 const updateUser = async (req, res) => {
 
   try {
-      const {id} = req.params
+      const {id} = req.user
       
       const {firstName, lastName, username, password, profile} = req.body
 
@@ -82,7 +82,7 @@ const updateUser = async (req, res) => {
 const deleteUser = async (req, res) => {
   try {
 
-    const {id} = req.params
+    const {id} = req.user
 
     const user = await User.findByIdAndDelete({_id: id})
     

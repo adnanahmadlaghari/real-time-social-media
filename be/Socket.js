@@ -1,4 +1,5 @@
 const { Server } = require("socket.io");
+
 const Task = require("./models/Task");
 
 const setupSocket = (server) => {
@@ -16,17 +17,25 @@ const setupSocket = (server) => {
       const post = await Task.create({ author, title, content, media });
 
       io.emit("new-post", post); // broadcast to all
+      
       if (callback) callback({ success: true, post });
 
-      console.log("Created:", post);
     } catch (error) {
       if (callback) callback({ success: false, error: error.message });
     }
   };
 
-  const updatePost = async ({ id, data }, callback) => {
+  const updatePost = async (
+    { id, author, title, content, media }, callback ) => {
     try {
-      const updatedPost = await Task.findByIdAndUpdate(id, data, { new: true });
+      const updatedPost = await Task.findByIdAndUpdate(
+        id,
+        { author, title, content, media },
+        { new: true }
+      );
+      if (!author || !title || !content) {
+        return callback({ success: false, error: "Missing required fields" });
+      }
 
       if (!updatedPost) throw new Error("Post not found");
 

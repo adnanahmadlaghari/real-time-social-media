@@ -10,12 +10,10 @@ dotenv.config();
 require("./jwt/accessToken")
 const http = require("http");
 
-
 const app = express();
 const server = http.createServer(app)
 
-
-// Middleware to parse JSON data
+// Middleware
 app.use(express.json());
 app.use(passport.initialize())
 
@@ -23,8 +21,6 @@ app.use("/auth", authRouter)
 
 app.use("/users", passport.authenticate("jwt", {session: false}), userRoute)
 app.use("/tasks", passport.authenticate("jwt", {session: false}), taskRoute)
-
-
 
 // Middleware or routes
 app.get("/", (req, res) => {
