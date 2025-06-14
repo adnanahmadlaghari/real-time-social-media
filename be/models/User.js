@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const Task = require("./Task")
 
 const userSchema = new mongoose.Schema({
   firstName: {
@@ -26,6 +27,13 @@ userSchema.virtual("tasks", {
   localField: '_id',
   foreignField: 'author'
 })
-const User = mongoose.model("User", userSchema);
 
+userSchema.post("findOneAndDelete", async function(doc, next) {
+  if(doc){
+    await Task.deleteMany({author: doc._id})
+  }
+  next()
+})
+
+const User = mongoose.model("User", userSchema);
 module.exports = User;

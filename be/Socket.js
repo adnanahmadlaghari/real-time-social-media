@@ -50,7 +50,7 @@ const setupSocket = (server) => {
 
   const deletePost = async (id, callback) => {
     try {
-      const deletedPost = await Task.findByIdAndDelete(id);
+      const deletedPost = await Task.findOneAndDelete(id);
 
       if (!deletedPost) throw new Error("Post not found");
 
