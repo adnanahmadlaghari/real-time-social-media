@@ -8,19 +8,27 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import SignInContainer from '../components/SignInContainer';
 import RegisterCard from '../components/RegisterCard';
-import { Link as NavLink } from 'react-router-dom';
+import { Link as NavLink, useNavigate } from 'react-router-dom';
+import { useGlobalVar } from '../components/Global/Global';
+import { instance } from '../components/Instance/Instance';
+import { Alert } from '@mui/material';
 
 const Login = () => {
     const [formData, setFormData] = React.useState({
         username: "",
         password: ""
     })
+    const { setIsToken } = useGlobalVar()
+    const [isLoading, setIsLoading] = React.useState<boolean>(false)
+    const navigate = useNavigate()
+    const [Error, setError] = React.useState("")
+    const [success, setSuccess] = React.useState("")
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setFormData((prev) => ({
             ...prev,
-            [name] : value
+            [name]: value
         }))
     };
 
@@ -53,11 +61,38 @@ const Login = () => {
     //     return isValid;
     // };
 
+    const handleLogin = async () => {
+        setIsLoading(true)
+        try {
+            const response = await instance.post("/auth/login", formData, {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                }
+            })
+            const token = response.data.accessToken
+            if (token) {
+                localStorage.setItem("accessToken", token)
+                setIsToken(true)
+                setSuccess("Logged In successfully")
+            }
+            navigate("/")
+        } catch (error) {
+            console.log(error)
+            setError(error?.response?.data?.error)
+        } finally {
+            setIsLoading(false)
+        }
+    }
     return (
         <Box>
             <CssBaseline enableColorScheme />
             <SignInContainer direction="column" justifyContent="space-between">
                 <RegisterCard variant="outlined">
+                    <>
+                        {Error && <Alert severity="error">{Error}</Alert>}
+                        {success && <Alert severity="success">{success}</Alert>}
+                    </>
                     <Typography
                         component="h1"
                         variant="h4"
@@ -105,11 +140,14 @@ const Login = () => {
                             Forgot your password?
                         </Typography>
                         <Button
-                            type="submit"
                             fullWidth
                             variant="contained"
+                            disabled={isLoading}
+                            onClick={handleLogin}
                         >
-                            Sign in
+                            {
+                                isLoading ? "Signing In..." : "Sign In"
+                            }
                         </Button>
 
                         <Typography sx={{ textAlign: 'center' }}>
@@ -117,7 +155,7 @@ const Login = () => {
                             <NavLink
                                 to={"/auth/register"}
                             >
-                                Sign up
+                                Sign In
                             </NavLink>
                         </Typography>
                     </Box>

@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors")
 const connectDB = require("./db/connect");
 const authRouter = require("./routes/Auth");
 const userRoute = require("./routes/User");
@@ -15,6 +16,9 @@ const server = http.createServer(app)
 
 // Middleware
 app.use(express.json());
+app.use(cors({
+  origin: "*"
+}))
 app.use(passport.initialize())
 
 app.use("/auth", authRouter)

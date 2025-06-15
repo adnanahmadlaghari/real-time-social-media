@@ -8,19 +8,25 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import SignInContainer from '../components/SignInContainer';
 import RegisterCard from '../components/RegisterCard';
-import { Link as NavLink } from 'react-router-dom';
-
-
-
-
+import { Link as NavLink, useNavigate } from 'react-router-dom';
+import { instance } from '../components/Instance/Instance';
+import { useGlobalVar } from '../components/Global/Global';
+import { Alert } from '@mui/material';
 
 const Register = () => {
+
     const [formData, setFormData] = React.useState({
         firstName: "",
         lastName: "",
         username: "",
-        password: ""
+        password: "",
+        profile: ""
     })
+    const [isLoading, setIsLoading] = React.useState<boolean>(false)
+    const { setIsToken } = useGlobalVar()
+    const navigate = useNavigate()
+    const [Error, setError] = React.useState("")
+    const [success, setSuccess] = React.useState("")
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -29,6 +35,31 @@ const Register = () => {
             [name]: value,
         }));
     };
+
+    const handleRegister = async () => {
+        setIsLoading(true)
+        try {
+            const response = await instance.post("/auth/register", formData, {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                }
+            })
+            const token = response.data.accessToken
+            if (token) {
+                localStorage.setItem("accessToken", token)
+                setIsToken(true)
+            }
+            setSuccess("Acount Created Successfully")
+            navigate("/")
+        } catch (error) {
+            console.log(error)
+            setError(error?.response?.data?.error || "Something went wrong!");
+
+        } finally {
+            setIsLoading(false)
+        }
+    }
 
     // const validateInputs = () => {
     //     const email = document.getElementById('email') as HTMLInputElement;
@@ -56,12 +87,33 @@ const Register = () => {
 
     //     return isValid;
     // };
+    React.useEffect(() => {
+        if (Error) {
+            const timer = setTimeout(() => {
+                setError("");
+            }, 5000);
+            return () => clearTimeout(timer);
+        }
+    }, [Error]);
+
+    React.useEffect(() => {
+        if (success) {
+            const timer = setTimeout(() => {
+                setSuccess("");
+            }, 5000);
+            return () => clearTimeout(timer);
+        }
+    }, [success]);
 
     return (
         <Box>
             <CssBaseline enableColorScheme />
             <SignInContainer direction="column" justifyContent="space-between">
                 <RegisterCard variant="outlined">
+                    <>
+                        {Error && <Alert severity="error">{Error}</Alert>}
+                        {success && <Alert severity="success">{success}</Alert>}
+                    </>
                     <Typography
                         component="h1"
                         variant="h4"
@@ -80,63 +132,69 @@ const Register = () => {
                         <FormControl>
                             <FormLabel htmlFor="firstName">First Name</FormLabel>
                             <TextField
-                                type="firstName"
-                                name="name"
-                                placeholder="First Name"
+                                id="firstName"
+                                name="firstName"
+                                type="text"
+                                placeholder="Enter your first name"
                                 value={formData.firstName}
                                 onChange={handleChange}
-                                autoFocus
                                 required
                                 fullWidth
                                 variant="outlined"
                             />
                         </FormControl>
+
                         <FormControl>
                             <FormLabel htmlFor="lastName">Last Name</FormLabel>
                             <TextField
-                                type="lastName"
+                                id="lastName"
                                 name="lastName"
-                                placeholder="Last Name"
+                                type="text"
+                                placeholder="Enter your last name"
                                 value={formData.lastName}
                                 onChange={handleChange}
-                                autoFocus
                                 required
                                 fullWidth
                                 variant="outlined"
                             />
                         </FormControl>
+
                         <FormControl>
-                            <FormLabel htmlFor="email">username</FormLabel>
+                            <FormLabel htmlFor="username">Username</FormLabel>
                             <TextField
-                                type="username"
-                                name="email"
-                                placeholder="username"
+                                id="username"
+                                name="username"
+                                type="text"
+                                placeholder="Choose a username"
                                 value={formData.username}
                                 onChange={handleChange}
-                                autoFocus
                                 required
                                 fullWidth
                                 variant="outlined"
                             />
                         </FormControl>
+
                         <FormControl>
                             <FormLabel htmlFor="password">Password</FormLabel>
                             <TextField
+                                id="password"
                                 name="password"
-                                placeholder="••••••"
                                 type="password"
+                                placeholder="••••••••"
                                 value={formData.password}
                                 onChange={handleChange}
-                                autoFocus
                                 required
                                 fullWidth
                                 variant="outlined"
                             />
                         </FormControl>
+
                         <Button
+                            disabled={isLoading}
                             type="submit"
                             fullWidth
                             variant="contained"
+                            onClick={handleRegister}
                         >
                             Sign Up
                         </Button>
@@ -144,9 +202,11 @@ const Register = () => {
                         <Typography sx={{ textAlign: 'center' }}>
                             Already have an account{' '}
                             <NavLink
-                            to={"/auth/signin"}
+                                to={"/auth/signin"}
                             >
-                                Sign In
+                                {
+                                    isLoading ? "Creating Account" : "Sign In"
+                                }
                             </NavLink>
                         </Typography>
                     </Box>
