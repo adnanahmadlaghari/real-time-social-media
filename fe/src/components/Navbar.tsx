@@ -20,7 +20,7 @@ import { useNavigate } from 'react-router-dom';
 const PrimarySearchAppBar: React.FC = () => {
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const { setTheme } = useGlobalVar()
+  const { setTheme, setIsToken } = useGlobalVar()
   const theme = useTheme()
   const navigation = useNavigate()
   const isMenuOpen = Boolean(anchorEl);
@@ -36,6 +36,13 @@ const PrimarySearchAppBar: React.FC = () => {
 
   const toggleTheme = () => {
     setTheme((prev) => prev === "light" ? "dark" : "light")
+  }
+
+  const Logout = () => {
+    localStorage.removeItem("accessToken")
+    localStorage.removeItem("selectedUser")
+    setIsToken(false)
+
   }
 
   const menuId = 'primary-search-account-menu';
@@ -56,7 +63,7 @@ const PrimarySearchAppBar: React.FC = () => {
       onClose={handleMenuClose}
     >
       <MenuItem onClick={() => { navigation("/profile"), setAnchorEl(null) }}>Profile</MenuItem>
-      <MenuItem >LogOut</MenuItem>
+      <MenuItem onClick={Logout}>LogOut</MenuItem>
     </Menu>
   );
 

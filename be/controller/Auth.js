@@ -9,6 +9,7 @@ const generateToken = (user) => {
     firstName: user.firstName,
     lastName: user.lastName,
     username: user.username,
+    bio: user.bio
   };
   
   const accessToken = jwt.sign(payload, process.env.JWT_ACCESS_KEY, {expiresIn: "1d"});
@@ -20,7 +21,7 @@ const generateToken = (user) => {
 
 const register = async (req, res) => {
   try {
-    const { firstName, lastName, username, profile, password } = req.body;
+    const { firstName, lastName, username, bio, profile, password } = req.body;
 
     const hashedPassword = await argon2.hash(password);
 
@@ -28,6 +29,7 @@ const register = async (req, res) => {
       firstName,
       lastName,
       username,
+      bio,
       profile,
       password: hashedPassword,
     });

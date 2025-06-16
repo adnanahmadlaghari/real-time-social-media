@@ -8,27 +8,58 @@ import {
   Typography,
   useTheme,
   useMediaQuery,
+  Grid,
 } from "@mui/material";
+import { useEffect, useState } from "react";
+import { instance } from "./Instance/Instance";
+import UserPostsCard from "./UserPostsCard";
 
 interface UserProfileProps {
-  id: number;
+  username: string;
   onBack?: () => void;
-  name?: string;
-  username?: string;
-  description?: string;
-  avatarUrl?: string;
+
 }
 
 const UserProfile: React.FC<UserProfileProps> = ({
-  id,
+  username,
   onBack,
-  name = "John Doe",
-  username = "johndoe123",
-  description = "This is a user profile description. It contains information about the user, their activities, and other relevant details.",
-  avatarUrl,
 }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [user, setUser] = useState<object>({})
+  const [Tasks, setTasks] = useState<any[]>([])
+
+
+  const hangleGetSingleUser = async (username: string) => {
+    setIsLoading(true)
+    try {
+      const token = localStorage.getItem("accessToken")
+      const response = await instance.get(`/users/${username}`, {
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+          "Authorization": `Bearer ${token}`
+        }
+      })
+      setUser(response.data.user)
+      setTasks(response.data.user.tasks)
+      console.log("i fired", response)
+    } catch (error) {
+
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+
+  useEffect(() => {
+    hangleGetSingleUser(username)
+  }, [])
+
+  if (isLoading) {
+    return "loading..."
+  }
 
   return (
     <Box
@@ -46,7 +77,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
         {isMobile ? (
           <></>
         ) : (
-          <IconButton onClick={onBack} aria-label="back" sx={{padding:2}}>
+          <IconButton onClick={onBack} aria-label="back" sx={{ padding: 2 }}>
             <ArrowBack />
           </IconButton>
         )}
@@ -70,22 +101,19 @@ const UserProfile: React.FC<UserProfileProps> = ({
         >
           <Stack direction="row" spacing={3} alignItems="center" justifyContent="center">
             {
-              isMobile ? (
-                <IconButton onClick={onBack} aria-label="back" sx={{padding:2}}>
-            <ArrowBack />
-          </IconButton>
-              ) : (
-                <></>
+              isMobile && (
+                <IconButton onClick={onBack} aria-label="back" sx={{ padding: 2 }}>
+                  <ArrowBack />
+                </IconButton>
               )
             }
             <Avatar
-              src={avatarUrl}
+              // src={}
               sx={{ width: 100, height: 100, fontSize: 30 }}
             >
-              {avatarUrl ? "" : name.charAt(0).toUpperCase()}
             </Avatar>
             <Stack alignItems="flex-start">
-              <Typography variant="h6">{name}</Typography>
+              <Typography variant="h6">{`${user.firstName} ${user.lastName}`}</Typography>
               <Typography variant="body2" color="text.secondary">
                 @{username}
               </Typography>
@@ -93,12 +121,21 @@ const UserProfile: React.FC<UserProfileProps> = ({
           </Stack>
 
           <Typography variant="body1" color="text.secondary">
-            {description}
+            {"description"}
           </Typography>
         </Stack>
       </Box>
 
       <Divider sx={{ my: 4 }} />
+      <Grid container spacing={7} wordwrap="wrap" justifyContent="center" alignItems="center" sx={{ p: 2 }}>
+        {
+          Tasks.map((task) => {
+            return <Grid key={task._id} sx={{ display: 'flex', justifyContent: 'center' }}>
+              <UserPostsCard {...task} {...user} />
+            </Grid>
+          })
+        }
+      </Grid>
     </Box>
   );
 };

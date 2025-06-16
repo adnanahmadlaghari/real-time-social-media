@@ -28,7 +28,7 @@ const PostCard: React.FC<CardProps> = ({
   return (
     <Card
       sx={{
-        width: { xs: '100%', sm: "100%", md: "100%", lg: 600 },
+        width: { xs: '100%', sm: "100%", md: "100%", lg: 400 },
         // margin: '24px auto',
         boxShadow: 4,
         borderRadius: 3,

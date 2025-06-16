@@ -38,7 +38,7 @@ export const CtxProvider = ({ children }: { children: ReactNode }) => {
             const socket = io("http://localhost:3000")
             setSocket(socket)
         }
-    }, [])
+    }, [isToken])
 
     useEffect(() => {
         if (!Socket) {
@@ -47,10 +47,12 @@ export const CtxProvider = ({ children }: { children: ReactNode }) => {
         }
         console.log("Socket is Connected Successfully")
 
+
         Socket.emit("get-all-posts", (posts: any) => {
             console.log(posts)
-            setPosts(posts.posts)
+            setPosts(Array.isArray(posts) ? posts : posts?.posts || [])
         })
+
 
     }, [Socket])
 

@@ -1,4 +1,4 @@
-import { Box, Grid } from "@mui/material";
+import { Box, Grid, Stack, Typography } from "@mui/material";
 import PostCard from "./Card";
 import UserProfile from "./UserProfile";
 import { useState } from "react";
@@ -58,7 +58,7 @@ const Posts: React.FC = () => {
         return stored ? JSON.parse(stored) : null;
     });
 
-    const {posts} = useGlobalVar()
+    const { posts } = useGlobalVar()
 
     const handleUserClick = (_id: string) => {
         const user = posts.find((post) => post._id === _id);
@@ -75,23 +75,37 @@ const Posts: React.FC = () => {
 
     return (
 
-        <Box sx={{ width: '100vw', height: '100vh',}}>
-            <Box>
-                <CreatePost />
-            </Box>
+        <Box>
             {
-                selectedUser ? (
-                    <UserProfile id={selectedUser.id} onBack={handleBack} />
+                posts.length <= 0 ? (
+                    <Stack width={"100%"} height={"100vh"} justifyContent={"center"} alignItems={"center"}>
+                        <Typography >No Posts</Typography>
+                    </Stack>
                 ) : (
-                    <Grid container spacing={7}  wordwrap="wrap" justifyContent="center" alignItems="center" sx={{ p: 2 }}>
+                    <Box sx={{ width: '100vw', height: '100vh', }}>
+
                         {
-                            posts.map((post) => {
-                                return <Grid key={post._id} sx={{ display: 'flex', justifyContent: 'center' }}>
-                                    <PostCard {...post} handleClick={handleUserClick} />
-                                </Grid>
-                            })
+                            selectedUser ? (
+                                <UserProfile username={selectedUser.author.username} onBack={handleBack} />
+                            ) : (
+                                <>
+                                    <Box>
+                                        <CreatePost />
+                                    </Box>
+                                    <Grid container spacing={7} wordwrap="wrap" justifyContent="center" alignItems="center" sx={{ p: 2 }}>
+                                        {
+                                            posts.map((post) => {
+                                                return <Grid key={post._id} sx={{ display: 'flex', justifyContent: 'center' }}>
+                                                    <PostCard {...post} handleClick={handleUserClick} />
+                                                </Grid>
+                                            })
+                                        }
+                                    </Grid>
+                                </>
+
+                            )
                         }
-                    </Grid>
+                    </Box>
                 )
             }
         </Box>

@@ -13,6 +13,9 @@ const userSchema = new mongoose.Schema({
     required: [true, "Username is required!"],
     unique: [true, "Username must be unique!"],
   },
+  bio: {
+    type: String
+  },
   password: {
     type: String,
     required: [true, "Password is required!"],

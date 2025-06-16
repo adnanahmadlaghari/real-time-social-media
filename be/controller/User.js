@@ -6,7 +6,7 @@ const getSingleUser = async (req, res) => {
   try {
     const { username } = req.params;
 
-    const user = await User.findOne({ username }).select("-password");
+    const user = await User.findOne({ username }).populate("tasks").select("-password");
 
     if (!user) {
       return res.status(404).json({
@@ -49,13 +49,14 @@ const updateUser = async (req, res) => {
   try {
       const {id} = req.user
       
-      const {firstName, lastName, username, password, profile} = req.body
+      const {firstName, lastName, username, bio, password, profile} = req.body
 
       const hashedPassword = await argon2.hash(password) 
       const user = await User.findByIdAndUpdate({_id: id},{
       firstName,
       lastName,
       username,
+      bio,
       password: hashedPassword,
       profile
     }, {new: true, runValidators: true}).select('-password')
