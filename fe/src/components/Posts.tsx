@@ -2,6 +2,8 @@ import { Box, Grid } from "@mui/material";
 import PostCard from "./Card";
 import UserProfile from "./UserProfile";
 import { useState } from "react";
+import CreatePost from "./CreatePost";
+import { useGlobalVar } from "./Global/Global";
 
 
 export const posting = [
@@ -46,14 +48,20 @@ export const posting = [
         Date: Date.now()
     },
 ]
+
+
+
 const Posts: React.FC = () => {
 
     const [selectedUser, setSelectedUser] = useState<any | null>(() => {
         const stored = localStorage.getItem("selectedUser");
         return stored ? JSON.parse(stored) : null;
     });
-    const handleUserClick = (id: number) => {
-        const user = posting.find((post) => post.id === id);
+
+    const {posts} = useGlobalVar()
+
+    const handleUserClick = (_id: string) => {
+        const user = posts.find((post) => post._id === _id);
         if (user) {
             setSelectedUser(user);
             localStorage.setItem("selectedUser", JSON.stringify(user));
@@ -68,14 +76,17 @@ const Posts: React.FC = () => {
     return (
 
         <Box sx={{ width: '100vw', height: '100vh',}}>
+            <Box>
+                <CreatePost />
+            </Box>
             {
                 selectedUser ? (
                     <UserProfile id={selectedUser.id} onBack={handleBack} />
                 ) : (
-                    <Grid container spacing={7}  wordWrap="wrap" justifyContent="center" alignItems="center" sx={{ p: 2 }}>
+                    <Grid container spacing={7}  wordwrap="wrap" justifyContent="center" alignItems="center" sx={{ p: 2 }}>
                         {
-                            posting.map((post) => {
-                                return <Grid key={post.id} sx={{ display: 'flex', justifyContent: 'center' }}>
+                            posts.map((post) => {
+                                return <Grid key={post._id} sx={{ display: 'flex', justifyContent: 'center' }}>
                                     <PostCard {...post} handleClick={handleUserClick} />
                                 </Grid>
                             })
