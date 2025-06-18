@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { io, type Socket as SocketType } from "socket.io-client";
+import { instance } from "../Instance/Instance";
 
 
 
@@ -26,7 +27,45 @@ export const CtxProvider = ({ children }: { children: ReactNode }) => {
     })
 
     const [Socket, setSocket] = useState<SocketType | null>(null);
+
     const [posts, setPosts] = useState<any[]>([])
+    const [image, setImage] = useState<File | null>(null);
+    const [title, setTitle] = useState("");
+    const [content, setContent] = useState("");
+
+    const handleCreatePost = async () => {
+        const token = localStorage.getItem("accessToken")
+        let mediaUrl = ""
+        try {
+            if (image) {
+                const formData = new FormData()
+                formData.append("media", image)
+
+                const response = await instance.post("/tasks/upload", formData, {
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    }
+                })
+
+                console.log(response)
+                mediaUrl = response.data.mediaUrl
+
+             if(Socket){
+                   Socket.emit("create-post", {
+                    title,
+                    content,
+                    media: mediaUrl,
+                }, (res: any) => {
+                    console.log("Post created:", res);
+                });
+             }
+            }
+
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
 
 
     useEffect(() => {
@@ -35,7 +74,11 @@ export const CtxProvider = ({ children }: { children: ReactNode }) => {
 
     useEffect(() => {
         if (localStorage.getItem("accessToken")) {
-            const socket = io("http://localhost:3000")
+            const socket = io("http://localhost:3000", {
+                auth:{
+                    token : localStorage.getItem("accessToken")
+                }
+            })
             setSocket(socket)
         }
     }, [isToken])
@@ -47,6 +90,10 @@ export const CtxProvider = ({ children }: { children: ReactNode }) => {
         }
         console.log("Socket is Connected Successfully")
 
+        Socket.on("new-post", (post) => {
+            setPosts(prev => [post, ...prev])
+        })
+
 
         Socket.emit("get-all-posts", (posts: any) => {
             console.log(posts)
@@ -57,7 +104,7 @@ export const CtxProvider = ({ children }: { children: ReactNode }) => {
     }, [Socket])
 
     return (
-        <GlobalContext.Provider value={{ theme, setTheme, setIsToken, isToken, posts, setPosts }}>
+        <GlobalContext.Provider value={{ theme, setTheme, setIsToken, isToken, posts, setPosts, handleCreatePost, setImage, setTitle, setContent, title, content }}>
             {children}
         </GlobalContext.Provider>
     )

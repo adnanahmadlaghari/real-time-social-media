@@ -47,7 +47,7 @@ const UserPostsCard: React.FC<CardProps> = ({
                 component="img"
                 height="600"
                 width={600}
-                image={"https://media.themoviedb.org/t/p/w300_and_h450_bestv2/gvBNGXWEyTHALxedaqRlOQgJt1S.jpg"}
+                image={`http://localhost:3000${media}`}
                 alt="Post image"
                 sx={{ objectFit: 'cover', }}
             />

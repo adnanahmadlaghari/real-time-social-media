@@ -61,6 +61,21 @@ const Login = () => {
     //     return isValid;
     // };
 
+    React.useEffect(() => {
+
+        if(Error){
+          const timer = setTimeout(() => {
+                setError("")
+            },5000)
+            return () => clearTimeout(timer)
+        }
+        if(success){
+            const timer = setTimeout(() => {
+
+            },5000)
+            return () => clearTimeout(timer)
+        }
+    }, [Error, success])
     const handleLogin = async () => {
         setIsLoading(true)
         try {
@@ -78,8 +93,12 @@ const Login = () => {
             }
             navigate("/")
         } catch (error) {
-            console.log(error)
-            setError(error?.response?.data?.error)
+            if(error.code === "ERR_NETWORK"){
+                setError(error.message)
+            }else{
+                console.log(error)
+                setError(error?.response?.data?.error)
+            }
         } finally {
             setIsLoading(false)
         }

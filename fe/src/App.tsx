@@ -7,6 +7,7 @@ import Profile from "./pages/Profile"
 import Register from "./pages/Register"
 import Login from "./pages/Login"
 import { useGlobalVar } from "./components/Global/Global"
+import CreatePost from "./components/CreatePost"
 
 
 function App() {
@@ -28,6 +29,7 @@ function App() {
             <Route index element={isToken ? <Dashboard /> : <Navigate to="/auth/signin" replace />} />
             <Route path="/chat" element={isToken ? <Chat /> : <Navigate to="/auth/signin" replace />} />
             <Route path="/profile" element={isToken ? <Profile /> : <Navigate to="/auth/signin" replace />} />
+            <Route path="/create-post" element={isToken ? <CreatePost /> : <Navigate to="/auth/signin" replace />} />
           </Route>
           <Route path="/auth/register" element={isToken ? <Navigate to="/" replace /> : <Register />} />
           <Route path="/auth/signin" element={isToken ? <Navigate to="/" replace /> : <Login />} />

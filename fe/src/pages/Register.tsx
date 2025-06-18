@@ -53,8 +53,12 @@ const Register = () => {
             setSuccess("Acount Created Successfully")
             navigate("/")
         } catch (error) {
-            console.log(error)
-            setError(error?.response?.data?.error || "Something went wrong!");
+            if(error.code === "ERR_NETWORK"){
+                setError(error.message)
+            }else{
+                console.log(error)
+                setError(error?.response?.data?.error)
+            }
 
         } finally {
             setIsLoading(false)
