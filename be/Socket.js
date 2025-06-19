@@ -31,73 +31,100 @@ const setupSocket = (server) => {
     }
   });
 
-  const updatePost = async (
-    { id, author, title, content, media },
-    callback
-  ) => {
-    try {
-      const updatedPost = await Task.findByIdAndUpdate(
-        id,
-        { author, title, content, media },
-        { new: true }
-      );
-      if (!author || !title || !content) {
-        return callback({ success: false, error: "Missing required fields" });
-      }
-
-      if (!updatedPost) throw new Error("Post not found");
-
-      io.emit("updated-post", updatedPost);
-      if (callback) callback({ success: true, post: updatedPost });
-
-      console.log("Updated:", updatedPost);
-    } catch (error) {
-      if (callback) callback({ success: false, error: error.message });
-    }
-  };
-
-  const deletePost = async (id, callback) => {
-    try {
-      const deletedPost = await Task.findOneAndDelete(id);
-
-      if (!deletedPost) throw new Error("Post not found");
-
-      io.emit("deleted-post", id);
-      if (callback) callback({ success: true, id });
-
-      console.log("Deleted:", deletedPost);
-    } catch (error) {
-      if (callback) callback({ success: false, error: error.message });
-    }
-  };
-
   io.on("connection", (socket) => {
     console.log("a user is connected", socket.id);
 
-  socket.on("create-post", async (payload, callback) => {
-    try {
-      const { title, content, media } = payload;
+    socket.on("create-post", async (payload, callback) => {
+      try {
+        const { title, content, media } = payload;
 
-      const post = await Task.create({
-        author: socket.user._id,
-        title,
-        content,
-        media,
-      });
+        const post = await Task.create({
+          author: socket.user._id,
+          title,
+          content,
+          media,
+        });
 
-      const populatedPost = await post.populate(
-        "author",
-        "firstName lastName username profile"
-      );
+        const populatedPost = await post.populate(
+          "author",
+          "firstName lastName username profile"
+        );
 
-      io.emit("new-post", populatedPost); // broadcast to all
+        io.emit("new-post", populatedPost); // broadcast to all
 
-      if (callback) callback({ success: true, post: populatedPost });
-    } catch (error) {
-      if (callback) callback({ success: false, error: error.message });
-    }
-  });
+        if (callback) callback({ success: true, post: populatedPost });
+      } catch (error) {
+        if (callback) callback({ success: false, error: error.message });
+      }
+    });
 
+    socket.on("my-posts", async (callback) => {
+      try {
+        const post = await Task.find({ author: socket.user._id }).populate(
+          "author",
+          "firstName lastName username profile"
+        );
+        callback({ success: true, post });
+      } catch (error) {
+        if (callback) callback({ success: false, error: error.message });
+      }
+    });
+
+    socket.on("update-post", async (payload, callback) => {
+      try {
+        const { id, title, content, media } = payload;
+        if (!id || !title || !content || !media) {
+          return callback({ success: false, error: "Missing required fields" });
+        }
+
+        const post = await Task.findById(id);
+        if (!post) throw new Error("Post not found");
+
+        // Ownership check
+        if (post.author.toString() !== socket.user._id.toString()) {
+          return callback({ success: false, error: "Unauthorized" });
+        }
+
+        // Update fields
+        post.title = title;
+        post.content = content;
+        post.media = media;
+
+        const updatedPost = await post.save();
+        await updatedPost.populate(
+          "author",
+          "firstName lastName username profile"
+        );
+
+        io.emit("updated-post", updatedPost);
+        if (callback) callback({ success: true, post: updatedPost });
+
+        console.log("Updated:", updatedPost);
+      } catch (error) {
+        if (callback) callback({ success: false, error: error.message });
+      }
+    });
+
+    socket.on("delete-post", async (id, callback) => {
+      try {
+        const post = await Task.findById(id);
+
+        if (!post) throw new Error("Post not found");
+
+        if (post.author.toString() !== socket.user._id.toString()) {
+          return callback({ success: false, error: "Unauthorized" });
+        }
+
+        await post.deleteOne();
+
+        io.emit("deleted-post", id);
+        if (callback) callback({ success: true, id });
+
+        console.log("Deleted:", post);
+      } catch (error) {
+        if (callback) callback({ success: false, error: error.message });
+      }
+    });
 
     socket.on("get-all-posts", async (callback) => {
       try {
@@ -109,9 +136,6 @@ const setupSocket = (server) => {
         callback({ success: false, error: err.message });
       }
     });
-
-    socket.on("update-post", updatePost);
-    socket.on("delete-post", deletePost);
 
     socket.on("disconnect", () => {
       console.log("user disconnected ", socket.id);
