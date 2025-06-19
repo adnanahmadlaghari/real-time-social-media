@@ -77,24 +77,19 @@ const setupSocket = (server) => {
           return callback({ success: false, error: "Missing required fields" });
         }
 
-        const post = await Task.findById(id);
-        if (!post) throw new Error("Post not found");
+        // Only update if the post exists AND belongs to the current user
+        const updatedPost = await Task.findOneAndUpdate(
+          { _id: id, author: socket.user._id },
+          { title, content, media },
+          { new: true }
+        ).populate("author", "firstName lastName username profile");
 
-        // Ownership check
-        if (post.author.toString() !== socket.user._id.toString()) {
-          return callback({ success: false, error: "Unauthorized" });
+        if (!updatedPost) {
+          return callback({
+            success: false,
+            error: "Unauthorized or Post not found",
+          });
         }
-
-        // Update fields
-        post.title = title;
-        post.content = content;
-        post.media = media;
-
-        const updatedPost = await post.save();
-        await updatedPost.populate(
-          "author",
-          "firstName lastName username profile"
-        );
 
         io.emit("updated-post", updatedPost);
         if (callback) callback({ success: true, post: updatedPost });
@@ -107,20 +102,22 @@ const setupSocket = (server) => {
 
     socket.on("delete-post", async (id, callback) => {
       try {
-        const post = await Task.findById(id);
+        const deletedPost = await Task.findOneAndDelete({
+          _id: id,
+          author: socket.user._id,
+        });
 
-        if (!post) throw new Error("Post not found");
-
-        if (post.author.toString() !== socket.user._id.toString()) {
-          return callback({ success: false, error: "Unauthorized" });
+        if (!deletedPost) {
+          return callback({
+            success: false,
+            error: "Unauthorized or Post not found",
+          });
         }
 
-        await post.deleteOne();
-
-        io.emit("deleted-post", id);
+        io.emit("deleted-post", { id }); // Emit only id
         if (callback) callback({ success: true, id });
 
-        console.log("Deleted:", post);
+        console.log("Deleted:", deletedPost);
       } catch (error) {
         if (callback) callback({ success: false, error: error.message });
       }
