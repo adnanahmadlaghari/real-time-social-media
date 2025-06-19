@@ -1,12 +1,13 @@
 const User = require("../models/User");
-const argon2 = require("argon2")
-
+const argon2 = require("argon2");
 
 const getSingleUser = async (req, res) => {
   try {
     const { username } = req.params;
 
-    const user = await User.findOne({ username }).populate("tasks").select("-password");
+    const user = await User.findOne({ username })
+      .populate("tasks")
+      .select("-password");
 
     if (!user) {
       return res.status(404).json({
@@ -45,32 +46,35 @@ const getAllUser = async (req, res) => {
 };
 
 const updateUser = async (req, res) => {
-
   try {
-      const {id} = req.user
-      
-      const {firstName, lastName, username, bio, password, profile} = req.body
+    const { id } = req.user;
 
-      const hashedPassword = await argon2.hash(password) 
-      const user = await User.findByIdAndUpdate({_id: id},{
-      firstName,
-      lastName,
-      username,
-      bio,
-      password: hashedPassword,
-      profile
-    }, {new: true, runValidators: true}).select('-password')
+    const { firstName, lastName, username, bio, password, profile } = req.body;
 
-    if(!user) {
+    const hashedPassword = await argon2.hash(password);
+    const user = await User.findByIdAndUpdate(
+      { _id: id },
+      {
+        firstName,
+        lastName,
+        username,
+        bio,
+        password: hashedPassword,
+        profile,
+      },
+      { new: true, runValidators: true }
+    ).select("-password");
+
+    if (!user) {
       return res.status(404).json({
         success: false,
-        error: "User Not Found"
-      })
+        error: "User Not Found",
+      });
     }
     res.status(200).json({
       success: true,
-      user
-    })
+      user,
+    });
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -82,22 +86,21 @@ const updateUser = async (req, res) => {
 
 const deleteUser = async (req, res) => {
   try {
+    const { id } = req.user;
 
-    const {id} = req.user
+    const user = await User.findByIdAndDelete({ _id: id });
 
-    const user = await User.findByIdAndDelete({_id: id})
-    
-    if(!user){
+    if (!user) {
       return res.status(404).json({
         success: false,
-        error: "User Not Found"
-      })
+        error: "User Not Found",
+      });
     }
 
     res.status(200).json({
       success: true,
-      msg: `User with ID: ${id} Deleted.`
-    })
+      msg: `User with ID: ${id} Deleted.`,
+    });
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -105,11 +108,29 @@ const deleteUser = async (req, res) => {
       msg: "Internal Server Error",
     });
   }
-}
+};
 
+const UploadProfilePic = async (req, res) => {
+  try {
+    if (!req.file)
+      return res
+        .status(400)
+        .json({ success: false, message: "No file uploaded" });
+    const filePath = `/uploads/profile/${req.file.filename}`;
+
+    res.status(200).json({ success: true, mediaUrl: filePath });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message,
+      msg: "Internal Server Error",
+    });
+  }
+};
 module.exports = {
   getSingleUser,
   getAllUser,
   updateUser,
-  deleteUser
+  deleteUser,
+  UploadProfilePic,
 };

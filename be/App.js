@@ -23,6 +23,7 @@ app.use(passport.initialize())
 
 app.use("/auth", authRouter)
 
+app.use("/uploads/profile", express.static("uploads/profile"));
 app.use("/uploads/file", express.static("uploads/file"));
 app.use("/users", passport.authenticate("jwt", {session: false}), userRoute)
 app.use("/tasks", passport.authenticate("jwt", {session: false}), taskRoute)
