@@ -40,6 +40,7 @@ const PrimarySearchAppBar: React.FC = () => {
 
   const Logout = () => {
     localStorage.removeItem("accessToken")
+    localStorage.removeItem("user")
     localStorage.removeItem("selectedUser")
     setIsToken(false)
 

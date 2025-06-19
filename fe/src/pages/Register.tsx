@@ -23,7 +23,7 @@ const Register = () => {
         profile: ""
     })
     const [isLoading, setIsLoading] = React.useState<boolean>(false)
-    const { setIsToken } = useGlobalVar()
+    const { setIsToken, setCurrentUser } = useGlobalVar()
     const navigate = useNavigate()
     const [Error, setError] = React.useState("")
     const [success, setSuccess] = React.useState("")
@@ -50,12 +50,16 @@ const Register = () => {
                 localStorage.setItem("accessToken", token)
                 setIsToken(true)
             }
+            const user = response.data.user;
+            localStorage.setItem("user", JSON.stringify(user)); 
+            setCurrentUser(user);
+
             setSuccess("Acount Created Successfully")
             navigate("/")
         } catch (error) {
-            if(error.code === "ERR_NETWORK"){
+            if (error.code === "ERR_NETWORK") {
                 setError(error.message)
-            }else{
+            } else {
                 console.log(error)
                 setError(error?.response?.data?.error)
             }

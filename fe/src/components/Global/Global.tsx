@@ -26,6 +26,11 @@ export const CtxProvider = ({ children }: { children: ReactNode }) => {
         return !!token
     })
 
+    const [CrruntUser, setCurrentUser] = useState(() => {
+        const storedUser = localStorage.getItem("user");
+        return storedUser ? JSON.parse(storedUser) : null;
+    });
+
     const [Socket, setSocket] = useState<SocketType | null>(null);
 
     const [posts, setPosts] = useState<any[]>([])
@@ -50,15 +55,15 @@ export const CtxProvider = ({ children }: { children: ReactNode }) => {
                 console.log(response)
                 mediaUrl = response.data.mediaUrl
 
-             if(Socket){
-                   Socket.emit("create-post", {
-                    title,
-                    content,
-                    media: mediaUrl,
-                }, (res: any) => {
-                    console.log("Post created:", res);
-                });
-             }
+                if (Socket) {
+                    Socket.emit("create-post", {
+                        title,
+                        content,
+                        media: mediaUrl,
+                    }, (res: any) => {
+                        console.log("Post created:", res);
+                    });
+                }
             }
 
         } catch (error) {
@@ -73,10 +78,16 @@ export const CtxProvider = ({ children }: { children: ReactNode }) => {
     }, [theme])
 
     useEffect(() => {
+        if (CrruntUser) {
+            localStorage.setItem("user", JSON.stringify(CrruntUser));
+        }
+    }, [CrruntUser]);
+
+    useEffect(() => {
         if (localStorage.getItem("accessToken")) {
             const socket = io("http://localhost:3000", {
-                auth:{
-                    token : localStorage.getItem("accessToken")
+                auth: {
+                    token: localStorage.getItem("accessToken")
                 }
             })
             setSocket(socket)
@@ -104,7 +115,22 @@ export const CtxProvider = ({ children }: { children: ReactNode }) => {
     }, [Socket])
 
     return (
-        <GlobalContext.Provider value={{ theme, setTheme, setIsToken, isToken, posts, setPosts, handleCreatePost, setImage, setTitle, setContent, title, content }}>
+        <GlobalContext.Provider value={{
+            theme,
+            setTheme,
+            setIsToken,
+            isToken,
+            posts,
+            setPosts,
+            handleCreatePost,
+            setImage,
+            setTitle,
+            setContent,
+            title,
+            content,
+            setCurrentUser,
+            CrruntUser
+        }}>
             {children}
         </GlobalContext.Provider>
     )

@@ -4,14 +4,23 @@ import {
   Divider,
   Stack,
   Typography,
-  useTheme,
-  useMediaQuery,
 } from "@mui/material";
+import { useGlobalVar } from "../components/Global/Global";
 
 
 
-const UserProfile: React.FC = ({
-}) => {
+const UserProfile: React.FC = () => {
+
+  const { CrruntUser } = useGlobalVar()
+
+
+  if (!CrruntUser) {
+    return (
+      <Box sx={{ p: 4 }}>
+        <Typography variant="h6">Loading user...</Typography>
+      </Box>
+    );
+  }
 
   return (
     <Box
@@ -46,23 +55,25 @@ const UserProfile: React.FC = ({
             <Avatar
               sx={{ width: 100, height: 100, fontSize: 30 }}
             >
-R
+              R
             </Avatar>
             <Stack alignItems="flex-start">
-              <Typography variant="h6">{"adnan"}</Typography>
+              <Typography variant="h6">{CrruntUser.firstName} {CrruntUser.lastName}</Typography>
               <Typography variant="body2" color="text.secondary">
-                adnan ahmad
+                {CrruntUser.username}
               </Typography>
             </Stack>
           </Stack>
 
           <Typography variant="body1" color="text.secondary">
-            this is discription of the profile. It can be a brief introduction or any other relevant information about the user.
+            {CrruntUser.bio}
           </Typography>
         </Stack>
       </Box>
 
       <Divider sx={{ my: 4 }} />
+
+
     </Box>
   );
 };

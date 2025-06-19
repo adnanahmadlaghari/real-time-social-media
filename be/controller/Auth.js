@@ -9,14 +9,18 @@ const generateToken = (user) => {
     firstName: user.firstName,
     lastName: user.lastName,
     username: user.username,
-    bio: user.bio
+    bio: user.bio,
   };
-  
-  const accessToken = jwt.sign(payload, process.env.JWT_ACCESS_KEY, {expiresIn: "1d"});
 
-  const refreshToken = jwt.sign(payload, process.env.JWT_REFRESH_KEY, {expiresIn: "7d"});
+  const accessToken = jwt.sign(payload, process.env.JWT_ACCESS_KEY, {
+    expiresIn: "1d",
+  });
 
-  return {accessToken, refreshToken}
+  const refreshToken = jwt.sign(payload, process.env.JWT_REFRESH_KEY, {
+    expiresIn: "7d",
+  });
+
+  return { accessToken, refreshToken };
 };
 
 const register = async (req, res) => {
@@ -25,7 +29,7 @@ const register = async (req, res) => {
 
     const hashedPassword = await argon2.hash(password);
 
-    const user = await User.create({
+    const createdUser = await User.create({
       firstName,
       lastName,
       username,
@@ -34,9 +38,11 @@ const register = async (req, res) => {
       password: hashedPassword,
     });
 
-    const {accessToken, refreshToken} = generateToken(user)
+    const user = await User.findById(createdUser._id).select("-password");
 
-    res.status(201).json({ success: true, accessToken, refreshToken});
+    const { accessToken, refreshToken } = generateToken(user);
+
+    res.status(201).json({ success: true, accessToken, refreshToken, user });
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -67,9 +73,9 @@ const login = async (req, res) => {
       });
     }
 
-    const {accessToken, refreshToken} = generateToken(user)
+    const { accessToken, refreshToken } = generateToken(user);
 
-    res.status(200).json({ success: true, accessToken, refreshToken });
+    res.status(200).json({ success: true, accessToken, refreshToken, user });
   } catch (error) {
     res.status(500).json({
       success: false,

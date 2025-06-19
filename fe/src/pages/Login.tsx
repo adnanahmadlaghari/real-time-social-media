@@ -18,7 +18,7 @@ const Login = () => {
         username: "",
         password: ""
     })
-    const { setIsToken } = useGlobalVar()
+    const { setIsToken, setCurrentUser } = useGlobalVar()
     const [isLoading, setIsLoading] = React.useState<boolean>(false)
     const navigate = useNavigate()
     const [Error, setError] = React.useState("")
@@ -91,6 +91,10 @@ const Login = () => {
                 setIsToken(true)
                 setSuccess("Logged In successfully")
             }
+            console.log(response)
+            const user = response.data.user;
+            localStorage.setItem("user", JSON.stringify(user)); 
+            setCurrentUser(user);
             navigate("/")
         } catch (error) {
             if(error.code === "ERR_NETWORK"){
