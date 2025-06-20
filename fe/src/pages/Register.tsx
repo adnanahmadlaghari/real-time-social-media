@@ -11,7 +11,7 @@ import RegisterCard from '../components/RegisterCard';
 import { Link as NavLink, useNavigate } from 'react-router-dom';
 import { instance } from '../components/Instance/Instance';
 import { useGlobalVar } from '../components/Global/Global';
-import { Alert } from '@mui/material';
+import { Alert, Avatar } from '@mui/material';
 
 const Register = () => {
 
@@ -20,13 +20,32 @@ const Register = () => {
         lastName: "",
         username: "",
         password: "",
-        profile: ""
+        profile: null
     })
     const [isLoading, setIsLoading] = React.useState<boolean>(false)
     const { setIsToken, setCurrentUser } = useGlobalVar()
     const navigate = useNavigate()
     const [Error, setError] = React.useState("")
     const [success, setSuccess] = React.useState("")
+
+    const [imagePreview, setImagePreview] = React.useState<string | null>(null);
+
+    const fileInputRef = React.useRef<HTMLInputElement | null>(null);
+
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setImagePreview(URL.createObjectURL(file));
+
+            // Set profile in formData
+            setFormData((prev) => ({
+                ...prev,
+                profile: file
+            }));
+        }
+    };
+
+
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -39,10 +58,18 @@ const Register = () => {
     const handleRegister = async () => {
         setIsLoading(true)
         try {
-            const response = await instance.post("/auth/register", formData, {
+            const data = new FormData();
+            data.append("firstName", formData.firstName);
+            data.append("lastName", formData.lastName);
+            data.append("username", formData.username);
+            data.append("password", formData.password);
+            if (formData.profile) {
+                data.append("profile", formData.profile);
+            }
+
+            const response = await instance.post("/auth/register", data, {
                 headers: {
-                    "Content-Type": "application/json",
-                    "Accept": "application/json"
+                    "Content-Type": "multipart/form-data",
                 }
             })
             const token = response.data.accessToken
@@ -51,7 +78,7 @@ const Register = () => {
                 setIsToken(true)
             }
             const user = response.data.user;
-            localStorage.setItem("user", JSON.stringify(user)); 
+            localStorage.setItem("user", JSON.stringify(user));
             setCurrentUser(user);
 
             setSuccess("Acount Created Successfully")
@@ -129,12 +156,17 @@ const Register = () => {
                     >
                         Sign Up
                     </Typography>
+                    <FormControl sx={{alignItems: "center"}}>
+                        <Avatar src={imagePreview || undefined} onClick={() => fileInputRef.current?.click()} sx={{height: "100px", width:"100px"}}/>
+                        <input type="file" accept="image/*" ref={fileInputRef} onChange={handleImageChange} hidden />
+                    </FormControl>
+
                     <Box
                         sx={{
                             display: 'flex',
                             flexDirection: 'column',
                             width: '100%',
-                            gap: 2,
+                            gap: 1.5,
                         }}
                     >
                         <FormControl>

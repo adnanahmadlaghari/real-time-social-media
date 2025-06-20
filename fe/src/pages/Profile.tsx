@@ -54,9 +54,9 @@ const UserProfile: React.FC = () => {
           <Stack direction="row" spacing={3} alignItems="center" justifyContent="center">
             <Avatar
               sx={{ width: 100, height: 100, fontSize: 30 }}
-            >
-              R
-            </Avatar>
+              src={`http://localhost:3000${CrruntUser.profile}`}
+            />
+           
             <Stack alignItems="flex-start">
               <Typography variant="h6">{CrruntUser.firstName} {CrruntUser.lastName}</Typography>
               <Typography variant="body2" color="text.secondary">

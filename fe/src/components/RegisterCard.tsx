@@ -6,8 +6,8 @@ const RegisterCard = styled(MuiCard)(({ theme }) => ({
     flexDirection: 'column',
     alignSelf: 'center',
     width: '100%',
-    padding: theme.spacing(2),
-    gap: theme.spacing(2),
+    padding: theme.spacing(1),
+    gap: theme.spacing(1),
     margin: 'auto',
     [theme.breakpoints.up('sm')]: {
         maxWidth: '450px',

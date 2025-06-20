@@ -10,6 +10,7 @@ import { useGlobalVar } from "./components/Global/Global"
 import CreatePost from "./components/CreatePost"
 
 
+
 function App() {
 
   const theme = useTheme()
@@ -30,6 +31,7 @@ function App() {
             <Route path="/chat" element={isToken ? <Chat /> : <Navigate to="/auth/signin" replace />} />
             <Route path="/profile" element={isToken ? <Profile /> : <Navigate to="/auth/signin" replace />} />
             <Route path="/create-post" element={isToken ? <CreatePost /> : <Navigate to="/auth/signin" replace />} />
+            {/* <Route path="/upload-profile" element={isToken ? <UploadProfilePic /> : <Navigate to="/auth/signin" replace />} /> */}
           </Route>
           <Route path="/auth/register" element={isToken ? <Navigate to="/" replace /> : <Register />} />
           <Route path="/auth/signin" element={isToken ? <Navigate to="/" replace /> : <Login />} />

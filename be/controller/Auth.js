@@ -25,7 +25,10 @@ const generateToken = (user) => {
 
 const register = async (req, res) => {
   try {
-    const { firstName, lastName, username, bio, profile, password } = req.body;
+    const { firstName, lastName, username, bio, password } = req.body;
+     const profile = req.file
+      ? `/uploads/profile/${req.file.filename}`
+      : null;
 
     const hashedPassword = await argon2.hash(password);
 
