@@ -34,9 +34,14 @@ export const CtxProvider = ({ children }: { children: ReactNode }) => {
     const [Socket, setSocket] = useState<SocketType | null>(null);
 
     const [posts, setPosts] = useState<any[]>([])
+    const [MyPosts, setMyPosts] = useState<any[]>([])
+
     const [image, setImage] = useState<File | null>(null);
+
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
+    const [IsLoading, setIsLoading] = useState<boolean>(false)
+
 
     const handleCreatePost = async () => {
         const token = localStorage.getItem("accessToken")
@@ -71,7 +76,37 @@ export const CtxProvider = ({ children }: { children: ReactNode }) => {
         }
     }
 
-
+    const handleEditPost = async (id: string) => {
+        const token = localStorage.getItem("accessToken")
+        setIsLoading(true)
+        let mediaUrl = ""
+        try {
+            if (image) {
+                const formData = new FormData()
+                formData.append("media", image)
+                const res = await instance.post("/tasks/upload", formData, {
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    }
+                })
+                mediaUrl = res.data.mediaUrl
+            }
+            if (Socket) {
+                Socket.emit("update-post", {
+                    id,
+                    title,
+                    content,
+                    media: mediaUrl || "",
+                }, (res: any) => {
+                    console.log("Post update response:", res);
+                })
+            }
+        } catch (error) {
+            console.log(error)
+        } finally {
+            setIsLoading(false)
+        }
+    }
 
     useEffect(() => {
         localStorage.setItem("theme", theme)
@@ -101,13 +136,20 @@ export const CtxProvider = ({ children }: { children: ReactNode }) => {
         }
         console.log("Socket is Connected Successfully")
 
+        Socket.emit("my-posts", (posts) => {
+            setMyPosts(Array.isArray(posts) ? posts : posts?.post || [])
+            // console.log("my posts",posts)
+        })
+
+
+
         Socket.on("new-post", (post) => {
             setPosts(prev => [post, ...prev])
         })
 
 
         Socket.emit("get-all-posts", (posts: any) => {
-            console.log(posts)
+            // console.log(posts)
             setPosts(Array.isArray(posts) ? posts : posts?.posts || [])
         })
 
@@ -129,7 +171,9 @@ export const CtxProvider = ({ children }: { children: ReactNode }) => {
             title,
             content,
             setCurrentUser,
-            CrruntUser
+            CrruntUser,
+            MyPosts,
+            handleEditPost
         }}>
             {children}
         </GlobalContext.Provider>

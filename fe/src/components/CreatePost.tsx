@@ -8,6 +8,7 @@ const CreatePost = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  
   const {setImage, setTitle, setContent, title, content, handleCreatePost} = useGlobalVar()
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {

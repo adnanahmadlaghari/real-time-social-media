@@ -2,16 +2,18 @@ import {
   Avatar,
   Box,
   Divider,
+  Grid,
   Stack,
   Typography,
 } from "@mui/material";
 import { useGlobalVar } from "../components/Global/Global";
+import MyPostsCard from "../components/MyPostsCard";
 
 
 
-const UserProfile: React.FC = () => {
+const Profile: React.FC = () => {
 
-  const { CrruntUser } = useGlobalVar()
+  const { CrruntUser, MyPosts } = useGlobalVar()
 
 
   if (!CrruntUser) {
@@ -56,11 +58,11 @@ const UserProfile: React.FC = () => {
               sx={{ width: 100, height: 100, fontSize: 30 }}
               src={`http://localhost:3000${CrruntUser.profile}`}
             />
-           
+
             <Stack alignItems="flex-start">
               <Typography variant="h6">{CrruntUser.firstName} {CrruntUser.lastName}</Typography>
               <Typography variant="body2" color="text.secondary">
-                {CrruntUser.username}
+                @{CrruntUser.username}
               </Typography>
             </Stack>
           </Stack>
@@ -72,10 +74,24 @@ const UserProfile: React.FC = () => {
       </Box>
 
       <Divider sx={{ my: 4 }} />
-
+      {
+        MyPosts.length <= 0 ? (<Stack sx={{ alignItems: "center" }}>
+          <Typography >No Posts</Typography>
+        </Stack>) : (
+          <Grid container spacing={7} wordwrap="wrap" justifyContent="center" alignItems="center" sx={{ p: 2 }}>
+            {
+              MyPosts.map((post) => {
+                return <Grid key={post._id} sx={{ display: 'flex', justifyContent: 'center' }}>
+                  <MyPostsCard {...post} />
+                </Grid>
+              })
+            }
+          </Grid>
+        )
+      }
 
     </Box>
   );
 };
 
-export default UserProfile;
+export default Profile;

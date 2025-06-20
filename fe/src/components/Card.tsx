@@ -44,9 +44,8 @@ const PostCard: React.FC<CardProps> = ({
     >
       <CardHeader
         avatar={
-          <Avatar sx={{ bgcolor: red[500], width: 56, height: 56 }} aria-label="profile">
-            {"adnan"}
-          </Avatar>
+          <Avatar sx={{ bgcolor: red[500], width: 56, height: 56 }} aria-label="profile" src={`http://localhost:3000${author.profile}`}/>
+            
         }
         title={<Typography variant="h6">{`${author.firstName} ${author.lastName}`}</Typography>}
         subheader={<Typography variant="body2">{createdAt}</Typography>}

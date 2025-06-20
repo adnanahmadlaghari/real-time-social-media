@@ -91,7 +91,7 @@ const Login = () => {
                 setIsToken(true)
                 setSuccess("Logged In successfully")
             }
-            console.log(response)
+            // console.log(response)
             const user = response.data.user;
             localStorage.setItem("user", JSON.stringify(user)); 
             setCurrentUser(user);
