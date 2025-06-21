@@ -13,7 +13,7 @@ import MyPostsCard from "../components/MyPostsCard";
 
 const Profile: React.FC = () => {
 
-  const { CrruntUser, MyPosts } = useGlobalVar()
+  const { CrruntUser, MyPosts, IsLoading } = useGlobalVar()
 
 
   if (!CrruntUser) {
@@ -22,6 +22,9 @@ const Profile: React.FC = () => {
         <Typography variant="h6">Loading user...</Typography>
       </Box>
     );
+  }
+  if(IsLoading) {
+    return <Typography>loading...</Typography>
   }
 
   return (
@@ -80,7 +83,7 @@ const Profile: React.FC = () => {
         </Stack>) : (
           <Grid container spacing={7} wordwrap="wrap" justifyContent="center" alignItems="center" sx={{ p: 2 }}>
             {
-              MyPosts.map((post) => {
+              MyPosts.map((post: any) => {
                 return <Grid key={post._id} sx={{ display: 'flex', justifyContent: 'center' }}>
                   <MyPostsCard {...post} />
                 </Grid>
@@ -89,7 +92,7 @@ const Profile: React.FC = () => {
           </Grid>
         )
       }
-
+      
     </Box>
   );
 };

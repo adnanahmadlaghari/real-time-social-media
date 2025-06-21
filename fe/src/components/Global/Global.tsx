@@ -1,5 +1,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+
 import { io, type Socket as SocketType } from "socket.io-client";
+
 import { instance } from "../Instance/Instance";
 
 
@@ -34,12 +36,14 @@ export const CtxProvider = ({ children }: { children: ReactNode }) => {
     const [Socket, setSocket] = useState<SocketType | null>(null);
 
     const [posts, setPosts] = useState<any[]>([])
+
     const [MyPosts, setMyPosts] = useState<any[]>([])
 
     const [image, setImage] = useState<File | null>(null);
 
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
+    
     const [IsLoading, setIsLoading] = useState<boolean>(false)
 
 
@@ -77,32 +81,73 @@ export const CtxProvider = ({ children }: { children: ReactNode }) => {
     }
 
     const handleEditPost = async (id: string) => {
-        const token = localStorage.getItem("accessToken")
-        setIsLoading(true)
-        let mediaUrl = ""
+        setIsLoading(true);
         try {
-            if (image) {
-                const formData = new FormData()
-                formData.append("media", image)
-                const res = await instance.post("/tasks/upload", formData, {
-                    headers: {
-                        "Authorization": `Bearer ${token}`
-                    }
-                })
-                mediaUrl = res.data.mediaUrl
-            }
             if (Socket) {
-                Socket.emit("update-post", {
-                    id,
-                    title,
-                    content,
-                    media: mediaUrl || "",
-                }, (res: any) => {
-                    console.log("Post update response:", res);
+                Socket.emit(
+                    "update-post",
+                    {
+                        id,
+                        title,
+                        content,
+                    },
+                    (res: any) => {
+                        // console.log("Post update response:", res);
+
+                        if (res.success && res.post) {
+                            //  Update in all posts
+                            setPosts((prev) =>
+                                prev.map((post) =>
+                                    post._id === res.post._id ? res.post : post
+                                )
+                            );
+
+                            //  Update in MyPosts too
+                            setMyPosts((prev) =>
+                                prev.map((post) =>
+                                    post._id === res.post._id ? res.post : post
+                                )
+                            );
+                        }
+                    }
+                );
+            }
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleDeletePost = async(id: string) => {
+        setIsLoading(true)
+        try {
+            if(Socket){
+                Socket.emit("delete-post", id, (res: any) => {
+                    if(res.success){
+                        console.log("post Deleted")
+                        setMyPosts(prev => prev.filter((post) => post._id !== res.id))
+                    }
                 })
             }
         } catch (error) {
             console.log(error)
+        }finally{
+            setIsLoading(false)
+        }
+    }
+
+    const handleMyPosts = () => {
+        setIsLoading(true)
+        try {
+            if (Socket) {
+                Socket.emit("my-posts", (posts: any) => {
+                    setMyPosts(Array.isArray(posts) ? posts : posts?.post || [])
+                    // console.log("my posts",posts)
+                })
+            }
+        } catch (error) {
+            console.log("error at getting my posts", error)
         } finally {
             setIsLoading(false)
         }
@@ -136,23 +181,24 @@ export const CtxProvider = ({ children }: { children: ReactNode }) => {
         }
         console.log("Socket is Connected Successfully")
 
-        Socket.emit("my-posts", (posts) => {
-            setMyPosts(Array.isArray(posts) ? posts : posts?.post || [])
-            // console.log("my posts",posts)
+        handleMyPosts()
+
+        Socket.on("updated-post", (post) => {
+            setPosts(prev => [post, ...prev])
         })
 
-
+        Socket.on("deleted-post", ({id}) => {
+            setPosts(prev => prev.filter((post) => post._id !== id))
+        })
 
         Socket.on("new-post", (post) => {
             setPosts(prev => [post, ...prev])
         })
 
-
         Socket.emit("get-all-posts", (posts: any) => {
             // console.log(posts)
             setPosts(Array.isArray(posts) ? posts : posts?.posts || [])
         })
-
 
     }, [Socket])
 
@@ -173,7 +219,9 @@ export const CtxProvider = ({ children }: { children: ReactNode }) => {
             setCurrentUser,
             CrruntUser,
             MyPosts,
-            handleEditPost
+            handleEditPost,
+            IsLoading,
+            handleDeletePost
         }}>
             {children}
         </GlobalContext.Provider>

@@ -7,6 +7,9 @@ import Typography from '@mui/material/Typography';
 import { red } from '@mui/material/colors';
 import { IconButton, Stack } from '@mui/material';
 import { Delete, Edit } from '@mui/icons-material';
+import PostUpdateDialog from './PostUpdateDialog';
+import { useState } from 'react';
+import { useGlobalVar } from './Global/Global';
 
 interface CardProps {
     _id: string,
@@ -25,6 +28,23 @@ const MyPostsCard: React.FC<CardProps> = ({
     createdAt,
     author,
 }) => {
+    const [OpenDialog, setOpenDialog] = useState(false)
+    const { setTitle, setContent, handleEditPost, handleDeletePost } = useGlobalVar()
+
+    const handleClickOpen = () => {
+        setTitle(title)
+        setContent(content)
+        setOpenDialog(true);
+    };
+
+    const handleClose = () => {
+        setOpenDialog(false);
+    };
+
+    const handleSubmitEdit = () => {
+        handleEditPost(_id);  
+        setOpenDialog(false); 
+    };
     return (
         <Card
             sx={{
@@ -50,12 +70,12 @@ const MyPostsCard: React.FC<CardProps> = ({
                     subheader={<Typography variant="body2">{createdAt}</Typography>}
                 />
                 <Stack paddingRight={2} direction={"row-reverse"} spacing={2}>
-                   <IconButton>
-                    <Edit />
-                   </IconButton>
-                   <IconButton>
-                    <Delete />
-                   </IconButton>
+                    <IconButton onClick={handleClickOpen}>
+                        <Edit />
+                    </IconButton>
+                    <IconButton onClick={() => handleDeletePost(_id)}>
+                        <Delete />
+                    </IconButton>
                 </Stack>
             </Stack>
             <CardMedia
@@ -75,6 +95,7 @@ const MyPostsCard: React.FC<CardProps> = ({
                     {content}
                 </Typography>
             </CardContent>
+            {OpenDialog && <PostUpdateDialog open={OpenDialog} handleClose={handleClose} edit={handleSubmitEdit} />}
         </Card>
     );
 };

@@ -26,7 +26,7 @@ const setupSocket = (server) => {
       socket.user = user;
       next();
     } catch (error) {
-      console.error("Socket auth error:", err.message);
+      console.error("Socket auth error:", error.message);
       next(new Error("Authentication failed"));
     }
   });
@@ -72,15 +72,15 @@ const setupSocket = (server) => {
 
     socket.on("update-post", async (payload, callback) => {
       try {
-        const { id, title, content, media } = payload;
-        if (!id || !title || !content || !media) {
+        const { id, title, content } = payload;
+        if (!id || !title || !content) {
           return callback({ success: false, error: "Missing required fields" });
         }
 
         // Only update if the post exists AND belongs to the current user
         const updatedPost = await Task.findOneAndUpdate(
           { _id: id, author: socket.user._id },
-          { title, content, media },
+          { title, content },
           { new: true }
         ).populate("author", "firstName lastName username profile");
 
