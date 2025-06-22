@@ -9,7 +9,6 @@ const generateToken = (user) => {
     firstName: user.firstName,
     lastName: user.lastName,
     username: user.username,
-    bio: user.bio,
   };
 
   const accessToken = jwt.sign(payload, process.env.JWT_ACCESS_KEY, {
@@ -25,7 +24,7 @@ const generateToken = (user) => {
 
 const register = async (req, res) => {
   try {
-    const { firstName, lastName, username, bio, password } = req.body;
+    const { firstName, lastName, username, password } = req.body;
      const profile = req.file
       ? `/uploads/profile/${req.file.filename}`
       : null;
@@ -36,7 +35,6 @@ const register = async (req, res) => {
       firstName,
       lastName,
       username,
-      bio,
       profile,
       password: hashedPassword,
     });

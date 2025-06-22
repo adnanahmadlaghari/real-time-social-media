@@ -1,6 +1,7 @@
 import {
   Avatar,
   Box,
+  Button,
   Divider,
   Grid,
   Stack,
@@ -8,12 +9,23 @@ import {
 } from "@mui/material";
 import { useGlobalVar } from "../components/Global/Global";
 import MyPostsCard from "../components/MyPostsCard";
+import ProfileDialog from "../components/ProfileDialog";
+import { useState } from "react";
 
 
 
 const Profile: React.FC = () => {
 
   const { CrruntUser, MyPosts, IsLoading } = useGlobalVar()
+    const [open, setOpen] = useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
 
 
   if (!CrruntUser) {
@@ -23,7 +35,7 @@ const Profile: React.FC = () => {
       </Box>
     );
   }
-  if(IsLoading) {
+  if (IsLoading) {
     return <Typography>loading...</Typography>
   }
 
@@ -57,10 +69,12 @@ const Profile: React.FC = () => {
           }}
         >
           <Stack direction="row" spacing={3} alignItems="center" justifyContent="center">
-            <Avatar
-              sx={{ width: 100, height: 100, fontSize: 30 }}
-              src={`http://localhost:3000${CrruntUser.profile}`}
-            />
+
+              <Avatar
+                sx={{ width: 100, height: 100, fontSize: 30, objectFit:"cover" }}
+                src={`http://localhost:3000${CrruntUser.profile}`}
+              />
+
 
             <Stack alignItems="flex-start">
               <Typography variant="h6">{CrruntUser.firstName} {CrruntUser.lastName}</Typography>
@@ -70,9 +84,11 @@ const Profile: React.FC = () => {
             </Stack>
           </Stack>
 
-          <Typography variant="body1" color="text.secondary">
-            {CrruntUser.bio}
-          </Typography>
+         <Stack sx={{alignItems: 'end'}}>
+          <Button variant="contained" onClick={handleClickOpen}>
+          Edit Profile
+         </Button>
+         </Stack>
         </Stack>
       </Box>
 
@@ -92,7 +108,9 @@ const Profile: React.FC = () => {
           </Grid>
         )
       }
-      
+{
+  open && <ProfileDialog handleClose={handleClose} open={handleClickOpen}/>
+}
     </Box>
   );
 };

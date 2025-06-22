@@ -47,9 +47,7 @@ const Posts: React.FC = () => {
                                 <UserProfile username={selectedUser.author.username} onBack={handleBack} />
                             ) : (
                                 <>
-                                    <Box sx={{textAlign:"end", p:3}}>
-                                        <Button onClick={() => navigate("/create-post")}>Create Post</Button>
-                                    </Box>
+
                                     <Grid container spacing={7} wordwrap="wrap" justifyContent="center" alignItems="center" sx={{ p: 2 }}>
                                         {
                                             posts.map((post) => {

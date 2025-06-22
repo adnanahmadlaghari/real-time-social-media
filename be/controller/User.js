@@ -1,5 +1,7 @@
 const User = require("../models/User");
 const argon2 = require("argon2");
+const fs = require("fs");
+const path = require("path");
 
 const getSingleUser = async (req, res) => {
   try {
@@ -49,7 +51,7 @@ const updateUser = async (req, res) => {
   try {
     const { id } = req.user;
 
-    const { firstName, lastName, username, bio, password, profile } = req.body;
+    const { firstName, lastName, username, password } = req.body;
 
     const hashedPassword = await argon2.hash(password);
     const user = await User.findByIdAndUpdate(
@@ -58,9 +60,7 @@ const updateUser = async (req, res) => {
         firstName,
         lastName,
         username,
-        bio,
         password: hashedPassword,
-        profile,
       },
       { new: true, runValidators: true }
     ).select("-password");
@@ -110,9 +110,55 @@ const deleteUser = async (req, res) => {
   }
 };
 
+const updateProfileImage = async (req, res) => {
+  try {
+    const { id } = req.user;
+
+    const userP = await User.findById(id).select("-password");
+
+    if (!userP) {
+      return res.status(404).json({
+        success: false,
+        error: "User Not Found",
+      });
+    }
+    if (!req.file) {
+      return res.status(404).json({
+        success: false,
+        error: "Profile Picture Is Missing",
+      });
+    }
+
+    if(userP.profile){
+      const oldImagePath = path.join(__dirname, "..", userP.profile)
+      if(fs.existsSync(oldImagePath)){
+        fs.unlinkSync(oldImagePath)
+      }
+    }
+    // console.log(req.file)
+
+    const newImagePath = `/uploads/profile/${req.file.filename}`
+    userP.profile = newImagePath
+    await userP.save()
+ 
+   return res.status(200).json({
+      success: true,
+      newImagePath,
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message,
+      msg: "Internal Server Error",
+    });
+  }
+};
+
 module.exports = {
   getSingleUser,
   getAllUser,
   updateUser,
   deleteUser,
+  updateProfileImage
 };

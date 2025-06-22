@@ -29,6 +29,7 @@ const CreatePost = () => {
           placeholder="Title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
+          required
         />
         <TextField
           fullWidth
@@ -37,6 +38,7 @@ const CreatePost = () => {
           placeholder="What's on your mind?"
           value={content}
           onChange={(e) => setContent(e.target.value)}
+          required
         />
         <Avatar
           variant="square"
