@@ -3,6 +3,8 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from "
 import { io, type Socket as SocketType } from "socket.io-client";
 
 import { instance } from "../Instance/Instance";
+import { useNavigate } from "react-router-dom";
+import Snackbar from "../Alert";
 
 
 
@@ -20,6 +22,7 @@ export const GlobalContext = createContext<GlobalContextType | null>(null);
 
 export const CtxProvider = ({ children }: { children: ReactNode }) => {
 
+    const navigate = useNavigate()
     const [theme, setTheme] = useState(() => {
         return localStorage.getItem("theme") || "light"
     })
@@ -37,19 +40,31 @@ export const CtxProvider = ({ children }: { children: ReactNode }) => {
 
     const [posts, setPosts] = useState<any[]>([])
 
+
+
+
     const [MyPosts, setMyPosts] = useState<any[]>([])
 
     const [image, setImage] = useState<File | null>(null);
 
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
-    
+    const [open, setOpen] = useState(false)
+    const [alert, setAlert] = useState<{ msg: string; severity: "error" | "warning" | "info" | "success" } | null>(null);
+
+
     const [IsLoading, setIsLoading] = useState<boolean>(false)
+
+    const handleClose = () => {
+        setOpen(false)
+    }
 
 
     const handleCreatePost = async () => {
+
         const token = localStorage.getItem("accessToken")
         let mediaUrl = ""
+        setIsLoading(true)
         try {
             if (image) {
                 const formData = new FormData()
@@ -70,6 +85,15 @@ export const CtxProvider = ({ children }: { children: ReactNode }) => {
                         content,
                         media: mediaUrl,
                     }, (res: any) => {
+                        setTitle("")
+                        setContent("")
+                        mediaUrl = ""
+                        navigate("/")
+                        if (res.success) {
+
+                            setAlert({ msg: "Published", severity: "success" });
+                            setOpen(true)
+                        }
                         console.log("Post created:", res);
                     });
                 }
@@ -77,6 +101,11 @@ export const CtxProvider = ({ children }: { children: ReactNode }) => {
 
         } catch (error) {
             console.log(error)
+            setAlert({ msg: error.message || "Something went wrong", severity: "error" });
+            setOpen(true)
+
+        } finally {
+            setIsLoading(false)
         }
     }
 
@@ -95,7 +124,7 @@ export const CtxProvider = ({ children }: { children: ReactNode }) => {
                         // console.log("Post update response:", res);
 
                         if (res.success && res.post) {
-                            //  Update in all posts
+                            //  Update in all posts optional i use broadcast to all users then state update there
                             setPosts((prev) =>
                                 prev.map((post) =>
                                     post._id === res.post._id ? res.post : post
@@ -108,31 +137,41 @@ export const CtxProvider = ({ children }: { children: ReactNode }) => {
                                     post._id === res.post._id ? res.post : post
                                 )
                             );
+
+                            setAlert({ msg: "Post Updated", severity: "success" });
+                            setOpen(true)
                         }
                     }
                 );
             }
         } catch (error) {
             console.log(error);
+            setAlert({ msg: error.message || "Something went wrong", severity: "error" });
+            setOpen(true)
         } finally {
             setIsLoading(false);
         }
     };
 
-    const handleDeletePost = async(id: string) => {
+    const handleDeletePost = async (id: string) => {
         setIsLoading(true)
         try {
-            if(Socket){
+            if (Socket) {
                 Socket.emit("delete-post", id, (res: any) => {
-                    if(res.success){
+                    if (res.success) {
                         console.log("post Deleted")
                         setMyPosts(prev => prev.filter((post) => post._id !== res.id))
+
+                        setAlert({ msg: "Post Deleted", severity: "success" });
+                        setOpen(true)
                     }
                 })
             }
         } catch (error) {
             console.log(error)
-        }finally{
+            setAlert({ msg: error.message || "Something went wrong", severity: "error" });
+            setOpen(true)
+        } finally {
             setIsLoading(false)
         }
     }
@@ -187,7 +226,7 @@ export const CtxProvider = ({ children }: { children: ReactNode }) => {
             setPosts(prev => [post, ...prev])
         })
 
-        Socket.on("deleted-post", ({id}) => {
+        Socket.on("deleted-post", ({ id }) => {
             setPosts(prev => prev.filter((post) => post._id !== id))
         })
 
@@ -201,6 +240,8 @@ export const CtxProvider = ({ children }: { children: ReactNode }) => {
         })
 
     }, [Socket])
+
+
 
     return (
         <GlobalContext.Provider value={{
@@ -223,6 +264,9 @@ export const CtxProvider = ({ children }: { children: ReactNode }) => {
             IsLoading,
             handleDeletePost
         }}>
+            {alert && (
+                <Snackbar msg={alert.msg} severity={alert.severity} onClose={handleClose} open={open} />
+            )}
             {children}
         </GlobalContext.Provider>
     )

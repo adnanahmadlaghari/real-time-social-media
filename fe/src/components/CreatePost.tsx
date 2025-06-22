@@ -9,7 +9,7 @@ const CreatePost = () => {
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   
-  const {setImage, setTitle, setContent, title, content, handleCreatePost} = useGlobalVar()
+  const {setImage, setTitle, setContent, title, content, handleCreatePost, IsLoading} = useGlobalVar()
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -49,8 +49,10 @@ const CreatePost = () => {
           onChange={handleImageChange}
           ref={fileInputRef}
         />
-        <Button onClick={handleCreatePost} variant="contained">
-          Post
+        <Button onClick={handleCreatePost} variant="contained" disabled={IsLoading}>
+         {
+        IsLoading ? "Uploading..." : "Publish"
+        }
         </Button>
       </Stack>
     </Box>

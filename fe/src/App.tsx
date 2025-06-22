@@ -1,4 +1,4 @@
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom"
+import {Navigate, Route, Routes } from "react-router-dom"
 import Layout from "./pages/Layout"
 import Dashboard from "./pages/Dashboard"
 import { Box, useTheme } from "@mui/material"
@@ -24,7 +24,6 @@ function App() {
       width: "100vw",
       boxSizing: "border-box"
     }}>
-      <BrowserRouter>
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={isToken ? <Dashboard /> : <Navigate to="/auth/signin" replace />} />
@@ -36,7 +35,6 @@ function App() {
           <Route path="/auth/register" element={isToken ? <Navigate to="/" replace /> : <Register />} />
           <Route path="/auth/signin" element={isToken ? <Navigate to="/" replace /> : <Login />} />
         </Routes>
-      </BrowserRouter>
     </Box >
   )
 }
