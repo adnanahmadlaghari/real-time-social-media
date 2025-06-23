@@ -3,7 +3,6 @@ import PostCard from "./Card";
 import UserProfile from "./UserProfile";
 import { useState } from "react";
 import { useGlobalVar } from "./Global/Global";
-import { useNavigate } from "react-router-dom";
 
 
 
@@ -14,9 +13,20 @@ const Posts: React.FC = () => {
         const stored = localStorage.getItem("selectedUser");
         return stored ? JSON.parse(stored) : null;
     });
-    const navigate = useNavigate()
 
-    const { posts } = useGlobalVar()
+    const {
+        posts,
+        setPage,
+        limit,
+        setLimit,
+        currentPage,
+        setCurrentPage,
+        totalPages,
+        Next,
+        prev,
+        total,
+        page
+    } = useGlobalVar()
 
     const handleUserClick = (_id: string) => {
         const user = posts.find((post) => post._id === _id);
@@ -34,6 +44,7 @@ const Posts: React.FC = () => {
     return (
 
         <Box>
+           
             {
                 posts.length <= 0 ? (
                     <Stack width={"100%"} height={"100vh"} justifyContent={"center"} alignItems={"center"}>
@@ -47,7 +58,11 @@ const Posts: React.FC = () => {
                                 <UserProfile username={selectedUser.author.username} onBack={handleBack} />
                             ) : (
                                 <>
-
+                                 <Stack direction={"row"} spacing={2}>
+                                    <Typography variant="h6">Total Pages: {totalPages}</Typography>
+                                    <Typography variant="h6">Total Posts: {total}</Typography>
+                                    <Typography variant="h6">Current Page: {currentPage}</Typography>
+                                 </Stack>
                                     <Grid container spacing={7} wordwrap="wrap" justifyContent="center" alignItems="center" sx={{ p: 2 }}>
                                         {
                                             posts.map((post) => {
@@ -57,6 +72,10 @@ const Posts: React.FC = () => {
                                             })
                                         }
                                     </Grid>
+                                    <Stack direction={"row"} spacing={2} justifyContent={"center"} p={3}>
+                                        <Button variant="contained" disabled={!prev} onClick={() => setPage(page -1)}>Previous</Button>
+                                        <Button variant="contained" disabled={!Next} onClick={() => setPage(page + 1)}>Next</Button>
+                                    </Stack>
                                 </>
 
                             )

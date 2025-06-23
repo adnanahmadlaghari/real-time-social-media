@@ -63,9 +63,9 @@ const PrimarySearchAppBar: React.FC = () => {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
+      <MenuItem onClick={() => navigation("/create-post")}>Create Post</MenuItem>
       <MenuItem onClick={() => { navigation("/profile"), setAnchorEl(null) }}>Profile</MenuItem>
       <MenuItem onClick={Logout}>LogOut</MenuItem>
-      <MenuItem onClick={() => navigation("/create-post")}>Create Post</MenuItem>
     </Menu>
   );
 

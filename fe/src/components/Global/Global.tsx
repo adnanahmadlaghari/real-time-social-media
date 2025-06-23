@@ -51,6 +51,13 @@ export const CtxProvider = ({ children }: { children: ReactNode }) => {
     const [content, setContent] = useState("");
     const [open, setOpen] = useState(false)
     const [alert, setAlert] = useState<{ msg: string; severity: "error" | "warning" | "info" | "success" } | null>(null);
+    const [page, setPage] = useState(1)
+    const [limit, setLimit] = useState(4)
+    const [totalPages, setTotalPages] = useState(1);
+    const [currentPage, setCurrentPage] = useState(1)
+    const [Next, setNext] = useState(false)
+    const [prev, setPrev] = useState(false)
+    const [total, setTotal] = useState(0)
 
 
     const [IsLoading, setIsLoading] = useState<boolean>(false)
@@ -76,7 +83,7 @@ export const CtxProvider = ({ children }: { children: ReactNode }) => {
                     }
                 })
 
-                console.log(response)
+                // console.log(response)
                 mediaUrl = response.data.mediaUrl
 
                 if (Socket) {
@@ -94,7 +101,7 @@ export const CtxProvider = ({ children }: { children: ReactNode }) => {
                             setAlert({ msg: "Published", severity: "success" });
                             setOpen(true)
                         }
-                        console.log("Post created:", res);
+                        // console.log("Post created:", res);
                     });
                 }
             }
@@ -161,7 +168,6 @@ export const CtxProvider = ({ children }: { children: ReactNode }) => {
                     if (res.success) {
                         console.log("post Deleted")
                         setMyPosts(prev => prev.filter((post) => post._id !== res.id))
-
                         setAlert({ msg: "Post Deleted", severity: "success" });
                         setOpen(true)
                     }
@@ -214,6 +220,21 @@ export const CtxProvider = ({ children }: { children: ReactNode }) => {
     }, [isToken])
 
     useEffect(() => {
+        if (!Socket) return;
+
+        Socket.emit("get-all-posts", { page, limit }, (res: any) => {
+            if (res.success) {
+                setPosts(res.posts);
+                setTotalPages(res.totalPages);
+                setCurrentPage(res.currentPage);
+                setNext(res.hasNextPage);
+                setPrev(res.hasPrevPage);
+                setTotal(res.total);
+            }
+        });
+    }, [Socket, page, limit]);
+
+    useEffect(() => {
         if (!Socket) {
             console.log("Socket is Not Connected")
             return
@@ -228,16 +249,27 @@ export const CtxProvider = ({ children }: { children: ReactNode }) => {
 
         Socket.on("deleted-post", ({ id }) => {
             setPosts(prev => prev.filter((post) => post._id !== id))
+            setTotal(prev => {
+                const newTotal = prev - 1;
+                setTotalPages(Math.ceil(newTotal / limit)); 
+                return newTotal;
+            });
         })
 
         Socket.on("new-post", (post) => {
             setPosts(prev => [post, ...prev])
+            setTotal(prev => {
+                const newTotal = prev + 1;
+                setTotalPages(Math.ceil(newTotal / limit));
+                return newTotal;
+            });
         })
 
-        Socket.emit("get-all-posts", (posts: any) => {
-            // console.log(posts)
-            setPosts(Array.isArray(posts) ? posts : posts?.posts || [])
-        })
+        return () => {
+            Socket.off("new-post");
+            Socket.off("updated-post");
+            Socket.off("deleted-post");
+        };
 
     }, [Socket])
 
@@ -262,7 +294,18 @@ export const CtxProvider = ({ children }: { children: ReactNode }) => {
             MyPosts,
             handleEditPost,
             IsLoading,
-            handleDeletePost
+            handleDeletePost,
+            page,
+            setPage,
+            limit,
+            setLimit,
+            currentPage,
+            setCurrentPage,
+            totalPages,
+            Next,
+            prev,
+            setTotal,
+            total
         }}>
             {alert && (
                 <Snackbar msg={alert.msg} severity={alert.severity} onClose={handleClose} open={open} />

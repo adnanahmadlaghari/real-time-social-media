@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const User = require("./models/User");
 
 const Task = require("./models/Task");
+const socketPagination = require("./middleware/Pagination");
 
 const setupSocket = (server) => {
   const io = new Server(server, {
@@ -117,18 +118,35 @@ const setupSocket = (server) => {
         io.emit("deleted-post", { id }); // Emit only id
         if (callback) callback({ success: true, id });
 
-        console.log("Deleted:", deletedPost);
+        // console.log("Deleted:", deletedPost);
       } catch (error) {
         if (callback) callback({ success: false, error: error.message });
       }
     });
 
-    socket.on("get-all-posts", async (callback) => {
+    socket.on("get-all-posts", async (payload, callback) => {
       try {
+        const { skip, limit, page } = socketPagination(payload);
+
+        const total = await Task.countDocuments()
+
         const posts = await Task.find()
           .populate("author", "firstName lastName username profile")
-          .sort({ createdAt: -1 });
-        callback({ success: true, posts });
+          .sort({ createdAt: -1 })
+          .skip(skip)
+          .limit(limit);
+
+          const totalPages = Math.ceil(total/limit)
+
+        callback({ 
+          success: true, 
+          posts,
+          currentPage: page,
+          totalPages,
+          hasNextPage: page < totalPages,
+          hasPrevPage: page > 1,
+          total 
+        });
       } catch (err) {
         callback({ success: false, error: err.message });
       }
