@@ -53,15 +53,19 @@ const updateUser = async (req, res) => {
 
     const { firstName, lastName, username, password } = req.body;
 
-    const hashedPassword = await argon2.hash(password);
+    const updateData = {
+      firstName,
+      lastName,
+      username,
+    };
+
+    if (password) {
+      updateData.password = await argon2.hash(password);
+    }
+
     const user = await User.findByIdAndUpdate(
       { _id: id },
-      {
-        firstName,
-        lastName,
-        username,
-        password: hashedPassword,
-      },
+      updateData,
       { new: true, runValidators: true }
     ).select("-password");
 

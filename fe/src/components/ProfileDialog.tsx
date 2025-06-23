@@ -81,7 +81,7 @@ const ProfileDialog: React.FC<Props> = ({ open, handleClose }) => {
                     ...prev,
                     profile: res.data?.newImagePath
                 }))
-                setAlert({ msg: "Published", severity: "success" });
+                setAlert({ msg: "Upload Profile", severity: "success" });
                 setOpenToast(true)
             }
         } catch (error) {
@@ -92,6 +92,62 @@ const ProfileDialog: React.FC<Props> = ({ open, handleClose }) => {
             setIsLoading(false)
         }
     }
+
+    const handleUpdateProfileInfo = async () => {
+        setIsLoading(true)
+        try {
+            const token = localStorage.getItem("accessToken")
+            const res = await instance.patch("/users", formData, {
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            })
+            // console.log(res)
+            setCurrentUser((prev: any) => ({
+                ...prev,
+                ...res.data.user
+            }))
+            if (res.data.user) {
+                setAlert({ msg: "Update Profile Info", severity: "success" });
+                setOpenToast(true)
+            }
+        } catch (error) {
+            console.log(error)
+            setAlert({ msg: error.response.data.error || "Something went wrong", severity: "error" });
+            setOpenToast(true)
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
+    const handleSubmit = async () => {
+        setIsLoading(true)
+        const promises = []
+
+        if (Image) {
+            promises.push(handleImageSubmit())
+        }
+
+        // Compare formData with CrruntUser to detect changes
+        const infoChanged =
+            formData.firstName !== CrruntUser.firstName ||
+            formData.lastName !== CrruntUser.lastName ||
+            formData.username !== CrruntUser.username
+
+        if (infoChanged) {
+            promises.push(handleUpdateProfileInfo())
+        }
+
+        try {
+            await Promise.all(promises)
+            // handleClose()
+        } catch (error) {
+            console.log(error)
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
 
     React.useEffect(() => {
         return () => {
@@ -105,9 +161,6 @@ const ProfileDialog: React.FC<Props> = ({ open, handleClose }) => {
 
     return (
         <React.Fragment>
-            <Button variant="outlined" onClick={open}>
-                Open full-screen dialog
-            </Button>
             <Dialog
                 fullScreen
                 open={open}
@@ -127,9 +180,9 @@ const ProfileDialog: React.FC<Props> = ({ open, handleClose }) => {
                             <CloseIcon />
                         </IconButton>
                         <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
-                            Sound
+                            Update Profile
                         </Typography>
-                        <Button autoFocus color="inherit" onClick={handleImageSubmit}>
+                        <Button autoFocus color="inherit" onClick={handleSubmit}>
                             save
                         </Button>
                     </Toolbar>
@@ -154,17 +207,23 @@ const ProfileDialog: React.FC<Props> = ({ open, handleClose }) => {
                         <input type="file" accept="image/*" ref={inputRef} onChange={handleImageChange} hidden />
                     </Badge>
                 </Stack>
-                <Stack p={3} spacing={3}>
-                    <Stack>
-                        <TextField placeholder='First Name' name='firstName' value={formData.firstName} onChange={handleChange} required />
-                    </Stack>
-                    <Stack>
-                        <TextField placeholder='Last Name' name='lastName' value={formData.lastName} onChange={handleChange} required />
-                    </Stack>
-                    <Stack>
-                        <TextField placeholder='username' name='username' value={formData.username} onChange={handleChange} required />
-                    </Stack>
-                </Stack>
+                {
+                    IsLoading ? (<Typography>
+                        loading...
+                    </Typography>) : (
+                        <Stack p={3} spacing={3}>
+                            <Stack>
+                                <TextField placeholder='First Name' name='firstName' value={formData.firstName} onChange={handleChange} required />
+                            </Stack>
+                            <Stack>
+                                <TextField placeholder='Last Name' name='lastName' value={formData.lastName} onChange={handleChange} required />
+                            </Stack>
+                            <Stack>
+                                <TextField placeholder='username' name='username' value={formData.username} onChange={handleChange} required />
+                            </Stack>
+                        </Stack>
+                    )
+                }
             </Dialog>
             {alert && (
                 <Snackbar msg={alert.msg} severity={alert.severity} onClose={handleClose} open={openToast} />
