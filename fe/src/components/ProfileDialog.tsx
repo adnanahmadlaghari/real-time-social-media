@@ -12,6 +12,7 @@ import { Avatar, Badge, Stack, TextField } from '@mui/material';
 import { useGlobalVar } from './Global/Global';
 import { AddAPhoto } from '@mui/icons-material';
 import { instance } from './Instance/Instance';
+import Snackbar from './Alert';
 
 interface Props {
     open: () => void,
@@ -38,58 +39,67 @@ const ProfileDialog: React.FC<Props> = ({ open, handleClose }) => {
     })
 
     const [Image, setImage] = React.useState<File | null>(null)
+
     const [imagePreview, setImagePreview] = React.useState<string | null>(null)
+
     const inputRef = React.useRef<HTMLInputElement>(null)
+
     const [IsLoading, setIsLoading] = React.useState(false)
+    const [alert, setAlert] = React.useState<{ msg: string; severity: "error" | "warning" | "info" | "success" } | null>(null);
+    const [openToast, setOpenToast] = React.useState(false)
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0]
-        if(file){
+        if (file) {
             setImage(file)
             setImagePreview(URL.createObjectURL(file))
         }
     }
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const {name, value} = e.target
+        const { name, value } = e.target
         setFormData((prev) => ({
             ...prev,
-            [name] : value
+            [name]: value
         }))
     }
 
-    const handleImageSubmit = async() => {
+    const handleImageSubmit = async () => {
         setIsLoading(true)
         try {
             const token = localStorage.getItem("accessToken")
             const data = new FormData()
             data.append("profile", Image)
             const res = await instance.patch("/users/update-profile", data, {
-                headers:{
-                    "Authorization" : `Bearer ${token}`,
+                headers: {
+                    "Authorization": `Bearer ${token}`,
                     "Content-Type": "multipart/form-data",
                 }
             })
-            if(res.data?.newImagePath){
+            if (res.data?.newImagePath) {
                 setCurrentUser((prev: any) => ({
                     ...prev,
                     profile: res.data?.newImagePath
                 }))
+                setAlert({ msg: "Published", severity: "success" });
+                setOpenToast(true)
             }
         } catch (error) {
             console.log(error)
-        }finally{
+            setAlert({ msg: error.message || "Something went wrong", severity: "error" });
+            setOpenToast(true)
+        } finally {
             setIsLoading(false)
         }
     }
 
     React.useEffect(() => {
-  return () => {
-    if (imagePreview) {
-      URL.revokeObjectURL(imagePreview)
-    }
-  }
-}, [imagePreview])
+        return () => {
+            if (imagePreview) {
+                URL.revokeObjectURL(imagePreview)
+            }
+        }
+    }, [imagePreview])
 
 
 
@@ -141,21 +151,24 @@ const ProfileDialog: React.FC<Props> = ({ open, handleClose }) => {
                         }
                     >
                         <Avatar sx={{ height: "150px", width: "150px" }} src={IsLoading ? "..." : imagePreview || `http://localhost:3000${CrruntUser.profile}`} />
-                        <input type="file" accept="image/*" ref={inputRef} onChange={handleImageChange} hidden/>
+                        <input type="file" accept="image/*" ref={inputRef} onChange={handleImageChange} hidden />
                     </Badge>
                 </Stack>
                 <Stack p={3} spacing={3}>
                     <Stack>
-                        <TextField placeholder='First Name' name='firstName' value={formData.firstName} onChange={handleChange} required/>
+                        <TextField placeholder='First Name' name='firstName' value={formData.firstName} onChange={handleChange} required />
                     </Stack>
                     <Stack>
-                        <TextField placeholder='Last Name' name='lastName' value={formData.lastName} onChange={handleChange} required/>
+                        <TextField placeholder='Last Name' name='lastName' value={formData.lastName} onChange={handleChange} required />
                     </Stack>
                     <Stack>
-                        <TextField placeholder='username' name='username' value={formData.username} onChange={handleChange} required/>
+                        <TextField placeholder='username' name='username' value={formData.username} onChange={handleChange} required />
                     </Stack>
                 </Stack>
             </Dialog>
+            {alert && (
+                <Snackbar msg={alert.msg} severity={alert.severity} onClose={handleClose} open={openToast} />
+            )}
         </React.Fragment>
     );
 }
