@@ -117,9 +117,10 @@ const deleteUser = async (req, res) => {
 const searchUsers = async(req, res) => {
 
   try {
+    
     const {search} = req.body
+    
     if(search === undefined || search === null){
-
        return res.status(400).json({ success: false, error: "Search term is required" });
     }
 
