@@ -5,10 +5,9 @@ const path = require("path");
 
 const getSingleUser = async (req, res) => {
   try {
-    const { username } = req.params;
+    const { username } = req.user;
 
     const user = await User.findOne({ username })
-      .populate("tasks")
       .select("-password");
 
     if (!user) {
@@ -32,8 +31,9 @@ const getSingleUser = async (req, res) => {
 };
 
 const getAllUser = async (req, res) => {
+  const {id} = req.user
   try {
-    const users = await User.find({}).populate("tasks").select("-password");
+    const users = await User.find({_id : {$ne: id}}).populate("tasks").select("-password");
     res.status(200).json({
       success: true,
       users,
@@ -114,6 +114,37 @@ const deleteUser = async (req, res) => {
   }
 };
 
+const searchUsers = async(req, res) => {
+
+  try {
+    const {search} = req.body
+    if(search === undefined || search === null){
+
+       return res.status(400).json({ success: false, error: "Search term is required" });
+    }
+
+    const sanitizedSearchTerm = search.trim().replace(
+      /[.*+?^${}()|[\]\\]/g,
+      "\\$&"
+    );
+
+    const regex = new RegExp(sanitizedSearchTerm, "i");
+
+    const contact = await User.find({$and: [
+      {_id: {$ne: req.user.id}},
+      {$or: [{firstName: regex}, {lastName: regex}, {username: regex}]}
+    ]})
+
+    res.status(200).json({success: true, contact})
+  } catch (error) {
+     res.status(500).json({
+      success: false,
+      error: error.message,
+      msg: "Internal Server Error",
+    });
+  }
+}
+
 const updateProfileImage = async (req, res) => {
   try {
     const { id } = req.user;
@@ -164,5 +195,6 @@ module.exports = {
   getAllUser,
   updateUser,
   deleteUser,
-  updateProfileImage
+  updateProfileImage,
+  searchUsers
 };

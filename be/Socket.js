@@ -4,6 +4,7 @@ const User = require("./models/User");
 
 const Task = require("./models/Task");
 const socketPagination = require("./middleware/Pagination");
+const Message = require("./models/Message");
 
 const setupSocket = (server) => {
   const io = new Server(server, {
@@ -32,8 +33,80 @@ const setupSocket = (server) => {
     }
   });
 
+  const userSocketMap = new Map();
+
   io.on("connection", (socket) => {
     console.log("a user is connected", socket.id);
+    const userID = socket.user._id;
+
+    socket.on("register", (userId) => {
+      if (!userId) return;
+
+      userSocketMap.set(userId, socket.id);
+      io.emit("online_users", Array.from(userSocketMap.keys()));
+      console.log(` Registered user ${userId} with socket ${socket.id}`);
+    });
+    console.log("socket map", userSocketMap);
+
+    socket.on("create-message", async (payload, callback) => {
+      try {
+        const { recipient, messageType, text, file } = payload;
+        if (!recipient || !messageType || (!text && !file)) {
+          return callback({ success: false, error: "Missing fields" });
+        }
+
+        const senderSocketID = socket.id;
+        const recipientSocketID = userSocketMap.get(recipient);
+        console.log("recipientSocketID", recipientSocketID);
+        console.log("senderSocketID", senderSocketID);
+
+        const createMessage = await Message.create({
+          sender: userID,
+          recipient,
+          messageType,
+          text,
+          file,
+        });
+        const MessageDoc = await Message.findById(createMessage._id);
+
+        if (recipientSocketID) {
+          io.to(recipientSocketID).emit("received-message", MessageDoc);
+        }
+        if (senderSocketID) {
+          io.to(senderSocketID).emit("received-message", MessageDoc);
+        }
+
+        console.log("Current Socket Map", Array.from(userSocketMap.entries()));
+        console.log("MessageDoc", MessageDoc);
+
+        callback({ success: true, message: MessageDoc });
+      } catch (error) {
+        if (callback) callback({ success: false, error: error.message });
+      }
+    });
+
+    socket.on("one-to-one-message", async (recipientId, callback) => {
+      try {
+        const senderId = socket.user._id;
+        if (!senderId || !recipientId) {
+          if (callback) {
+            callback({ success: false, error: "Both IDs are Required" });
+            return;
+          }
+        }
+
+        const oneToOne = await Message.find({
+          $or: [
+            { sender: senderId, recipient: recipientId },
+            { sender: recipientId, recipient: senderId },
+          ],
+        }).sort({ createdAt: 1 });
+
+        if (callback) callback({ success: true, oneToOne });
+      } catch (error) {
+        if (callback) callback({ success: false, error: error.message });
+      }
+    });
 
     socket.on("create-post", async (payload, callback) => {
       try {
@@ -128,7 +201,7 @@ const setupSocket = (server) => {
       try {
         const { skip, limit, page } = socketPagination(payload);
 
-        const total = await Task.countDocuments()
+        const total = await Task.countDocuments();
 
         const posts = await Task.find()
           .populate("author", "firstName lastName username profile")
@@ -136,16 +209,16 @@ const setupSocket = (server) => {
           .skip(skip)
           .limit(limit);
 
-          const totalPages = Math.ceil(total/limit)
+        const totalPages = Math.ceil(total / limit);
 
-        callback({ 
-          success: true, 
+        callback({
+          success: true,
           posts,
           currentPage: page,
           totalPages,
           hasNextPage: page < totalPages,
           hasPrevPage: page > 1,
-          total 
+          total,
         });
       } catch (err) {
         callback({ success: false, error: err.message });
@@ -154,6 +227,12 @@ const setupSocket = (server) => {
 
     socket.on("disconnect", () => {
       console.log("user disconnected ", socket.id);
+      for (const [userID, socketId] of userSocketMap.entries()) {
+        if (socketId === socket.id) {
+          userSocketMap.delete(userID);
+          break;
+        }
+      }
     });
   });
 };

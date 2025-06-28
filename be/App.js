@@ -10,6 +10,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 require("./jwt/accessToken")
 const http = require("http");
+const messageRoute = require("./routes/Message");
 
 const app = express();
 const server = http.createServer(app)
@@ -27,6 +28,7 @@ app.use("/uploads/profile", express.static("uploads/profile"));
 app.use("/uploads/file", express.static("uploads/file"));
 app.use("/users", passport.authenticate("jwt", {session: false}), userRoute)
 app.use("/tasks", passport.authenticate("jwt", {session: false}), taskRoute)
+app.use("/onetoone", passport.authenticate("jwt", {session: false}), messageRoute)
 
 // Middleware or routes
 app.get("/", (req, res) => {

@@ -1,8 +1,20 @@
 import { Box, IconButton, InputAdornment, TextField } from "@mui/material"
 import SendIcon from '@mui/icons-material/Send';
+import { useGlobalVar } from "./Global/Global";
+import type React from "react";
 
+interface Props{
+    Selected: string,
+}
 
-const ChatFooter = () => {
+const ChatFooter: React.FC<Props> = ({Selected}) => {
+
+    const {Text, setText, handleSendMessage} = useGlobalVar()
+
+    const handleSubmit = () => {
+        handleSendMessage(Selected)
+        console.log("i fired")
+    }
     return (
         <Box
             sx={{
@@ -15,6 +27,8 @@ const ChatFooter = () => {
                     fullWidth
                     type="text"
                     placeholder="Type your message..."
+                    onChange={(e) => setText(e.target.value)}
+                    value={Text}
                     multiline
                     maxRows={4}
                     style={{
@@ -25,13 +39,14 @@ const ChatFooter = () => {
                         input: {
                             endAdornment: (
                                 <InputAdornment position="end">
-                                    <IconButton>
+                                    <IconButton onClick={handleSubmit}>
                                         <SendIcon />
                                     </IconButton>
                                 </InputAdornment>
                             ),
                         },
                     }}
+                    
                 />
             </Box>
         </Box>

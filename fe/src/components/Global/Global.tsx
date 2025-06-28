@@ -37,16 +37,9 @@ export const CtxProvider = ({ children }: { children: ReactNode }) => {
     });
 
     const [Socket, setSocket] = useState<SocketType | null>(null);
-
     const [posts, setPosts] = useState<any[]>([])
-
-
-
-
     const [MyPosts, setMyPosts] = useState<any[]>([])
-
     const [image, setImage] = useState<File | null>(null);
-
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
     const [open, setOpen] = useState(false)
@@ -58,6 +51,10 @@ export const CtxProvider = ({ children }: { children: ReactNode }) => {
     const [Next, setNext] = useState(false)
     const [prev, setPrev] = useState(false)
     const [total, setTotal] = useState(0)
+    const [Selected, setSelected] = useState(null)
+    const [Text, setText] = useState("")
+    const [OneToOneMessages, setOneToOneMessages] = useState<any[]>([])
+
 
 
     const [IsLoading, setIsLoading] = useState<boolean>(false)
@@ -66,6 +63,22 @@ export const CtxProvider = ({ children }: { children: ReactNode }) => {
         setOpen(false)
     }
 
+    const getSingleUser = async () => {
+        const token = localStorage.getItem("accessToken")
+        try {
+
+            const res = await instance.get("/users/single", {
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            })
+            Socket?.emit("register", res.data.user._id)
+            Socket?.connect()
+            console.log(res)
+        } catch (error) {
+            console.log(error)
+        }
+    }
 
     const handleCreatePost = async () => {
 
@@ -198,6 +211,33 @@ export const CtxProvider = ({ children }: { children: ReactNode }) => {
         }
     }
 
+    const handleSendMessage = (id: string) => {
+
+        if (!Text || !Text.trim()) {
+            console.log("Empty message cannot be sent.");
+            return;
+        }
+        const payload = {
+            recipient: id,
+            text: Text,
+            messageType: "text",
+        }
+        console.log("Sending payload:", payload);
+        try {
+            if (Socket) {
+                Socket.emit("create-message", payload, (res: any) => {
+                    if (res.success) {
+                        setText("")
+                    } else {
+                        console.error("Error:", res.error);
+                    }
+                })
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     useEffect(() => {
         localStorage.setItem("theme", theme)
     }, [theme])
@@ -211,13 +251,59 @@ export const CtxProvider = ({ children }: { children: ReactNode }) => {
     useEffect(() => {
         if (localStorage.getItem("accessToken")) {
             const socket = io("http://localhost:3000", {
+                autoConnect: false,
                 auth: {
                     token: localStorage.getItem("accessToken")
                 }
             })
             setSocket(socket)
         }
-    }, [isToken])
+    }, [])
+
+
+
+    useEffect(() => {
+        if (!Socket) {
+            console.log("Socket is Not Connected")
+            return
+        }
+        console.log("Socket is Connected Successfully")
+        getSingleUser()
+        handleMyPosts()
+
+        Socket.on("updated-post", (post) => {
+            setPosts(prev => [post, ...prev])
+        })
+
+        Socket.on("deleted-post", ({ id }) => {
+            setPosts(prev => prev.filter((post) => post._id !== id))
+            setTotal(prev => {
+                const newTotal = prev - 1;
+                setTotalPages(Math.ceil(newTotal / limit));
+                return newTotal;
+            });
+        })
+
+        Socket.on("new-post", (post) => {
+            setPosts(prev => [post, ...prev])
+            setTotal(prev => {
+                const newTotal = prev + 1;
+                setTotalPages(Math.ceil(newTotal / limit));
+                return newTotal;
+            });
+        })
+
+        return () => {
+            if (Socket) {
+                Socket.off("new-post");
+                Socket.off("updated-post");
+                Socket.off("deleted-post");
+                Socket.disconnect()
+            }
+
+        };
+
+    }, [Socket])
 
     useEffect(() => {
         if (!Socket) return;
@@ -235,43 +321,36 @@ export const CtxProvider = ({ children }: { children: ReactNode }) => {
     }, [Socket, page, limit]);
 
     useEffect(() => {
-        if (!Socket) {
-            console.log("Socket is Not Connected")
-            return
+        if (!Socket) return;
+        if (Socket && Selected) {
+            Socket.emit("one-to-one-message", Selected, (res: any) => {
+                if (res.success) {
+                    console.log("one to one messages", res);
+                    setOneToOneMessages(res.oneToOne)
+
+                } else {
+                    console.log(res.error);
+                }
+            });
+
+
         }
-        console.log("Socket is Connected Successfully")
+    }, [Selected]);
 
-        handleMyPosts()
+// useEffect(() => {
+//     if (Socket) {
+//         Socket.on("received-message", (message: any) => {
+//             setOneToOneMessages((prev) => [...prev, message])
+//         }); 
+//     }
 
-        Socket.on("updated-post", (post) => {
-            setPosts(prev => [post, ...prev])
-        })
+//     return () => {
+//         if (Socket) {
+//             Socket.off("received-message");
+//         }
+//     };
+// }, [Socket]);
 
-        Socket.on("deleted-post", ({ id }) => {
-            setPosts(prev => prev.filter((post) => post._id !== id))
-            setTotal(prev => {
-                const newTotal = prev - 1;
-                setTotalPages(Math.ceil(newTotal / limit)); 
-                return newTotal;
-            });
-        })
-
-        Socket.on("new-post", (post) => {
-            setPosts(prev => [post, ...prev])
-            setTotal(prev => {
-                const newTotal = prev + 1;
-                setTotalPages(Math.ceil(newTotal / limit));
-                return newTotal;
-            });
-        })
-
-        return () => {
-            Socket.off("new-post");
-            Socket.off("updated-post");
-            Socket.off("deleted-post");
-        };
-
-    }, [Socket])
 
 
 
@@ -305,7 +384,15 @@ export const CtxProvider = ({ children }: { children: ReactNode }) => {
             Next,
             prev,
             setTotal,
-            total
+            total,
+            handleSendMessage,
+            Text,
+            setText,
+            Selected,
+            setSelected,
+            OneToOneMessages,
+            Socket,
+            setOneToOneMessages
         }}>
             {alert && (
                 <Snackbar msg={alert.msg} severity={alert.severity} onClose={handleClose} open={open} />

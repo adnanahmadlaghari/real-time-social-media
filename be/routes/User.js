@@ -5,7 +5,8 @@ const {
     getAllUser, 
     updateUser, 
     deleteUser, 
-    updateProfileImage 
+    updateProfileImage, 
+    searchUsers
 } = require("../controller/User")
 
 const uploadProfile = require("../middleware/ProfileMulter")
@@ -16,6 +17,7 @@ userRoute.route("/").get(getAllUser).patch(updateUser).delete(deleteUser)
 
 userRoute.route("/update-profile").patch(uploadProfile.single("profile"), updateProfileImage)
 
-userRoute.route("/:username").get(getSingleUser)
+userRoute.route("/single").get(getSingleUser)
+userRoute.route("/search").post(searchUsers)
 
 module.exports = userRoute

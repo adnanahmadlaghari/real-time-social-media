@@ -3,14 +3,21 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import { Avatar, Paper, Stack } from '@mui/material';
 
-const ChatHeader = () => {
+interface Props {
+  SelectedUserData: {
+    profile: string;
+    username: string;
+  };
+}
+
+const ChatHeader: React.FC<Props> = ({SelectedUserData}) => {
     return (
         <Box sx={{ padding: 2,}}>
             <Paper position="static">
                 <Toolbar>
                     <Stack spacing={2} direction="row" alignItems="center">
                         <Stack>
-                            <Avatar />
+                            <Avatar src={`http://localhost:3000${SelectedUserData?.profile}`}/>
                         </Stack>
                         <Stack>
                             <Typography
@@ -18,7 +25,7 @@ const ChatHeader = () => {
                                 noWrap
                                 component="div"
                             >
-                                Username
+                                {SelectedUserData?.username}
                             </Typography>
                         </Stack>
                     </Stack>
