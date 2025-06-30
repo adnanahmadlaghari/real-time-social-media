@@ -1,6 +1,8 @@
 const User = require("../models/User");
 const argon2 = require("argon2");
 const jwt = require("jsonwebtoken");
+const Role = require("../models/Role");
+const Permission = require("../models/Permission");
 require("dotenv").config();
 
 const generateToken = (user) => {
@@ -24,11 +26,17 @@ const generateToken = (user) => {
 
 const register = async (req, res) => {
   try {
-    const { firstName, lastName, username, password } = req.body;
+    const { firstName, lastName, username, role, password } = req.body;
      const profile = req.file
       ? `/uploads/profile/${req.file.filename}`
       : null;
 
+      const role_instance = await Role.find({name: role})
+      if(role_instance === 0 ){
+        return res.status(404).json({success: false, error: "role is wrong" });
+      }
+
+      console.log(role_instance)
     const hashedPassword = await argon2.hash(password);
 
     const createdUser = await User.create({
@@ -39,6 +47,7 @@ const register = async (req, res) => {
       password: hashedPassword,
     });
 
+    await Permission.create({user: createdUser._id, role : role_instance[0]._id})
     const user = await User.findById(createdUser._id).select("-password");
 
     const { accessToken, refreshToken } = generateToken(user);

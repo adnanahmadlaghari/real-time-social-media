@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
-const Task = require("./Task")
+const Task = require("./Task");
+const Permission = require("./Permission");
 
 const userSchema = new mongoose.Schema({
   firstName: {
@@ -13,6 +14,7 @@ const userSchema = new mongoose.Schema({
     required: [true, "Username is required!"],
     unique: [true, "Username must be unique!"],
   },
+  roles:[String],
   password: {
     type: String,
     required: [true, "Password is required!"],
@@ -34,6 +36,13 @@ userSchema.post("findOneAndDelete", async function(doc, next) {
   }
   next()
 })
+userSchema.post("findOneAndDelete", async function (doc, next) {
+  if (doc) {
+    await Permission.deleteMany({ user: doc._id });
+  }
+  next()
+});
+
 
 const User = mongoose.model("User", userSchema);
 module.exports = User;

@@ -12,6 +12,9 @@ import { Link as NavLink, useNavigate } from 'react-router-dom';
 import { instance } from '../components/Instance/Instance';
 import { useGlobalVar } from '../components/Global/Global';
 import { Alert, Avatar } from '@mui/material';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
 
 const Register = () => {
 
@@ -19,6 +22,7 @@ const Register = () => {
         firstName: "",
         lastName: "",
         username: "",
+        role: "User",
         password: "",
         profile: null
     })
@@ -38,7 +42,7 @@ const Register = () => {
             setImagePreview(URL.createObjectURL(file));
 
             // Set profile in formData
-            setFormData((prev) => ({
+            setFormData((prev:any) => ({
                 ...prev,
                 profile: file
             }));
@@ -54,6 +58,7 @@ const Register = () => {
             [name]: value,
         }));
     };
+    
 
     const handleRegister = async () => {
         setIsLoading(true)
@@ -62,6 +67,7 @@ const Register = () => {
             data.append("firstName", formData.firstName);
             data.append("lastName", formData.lastName);
             data.append("username", formData.username);
+            data.append("role", formData.role);
             data.append("password", formData.password);
             if (formData.profile) {
                 data.append("profile", formData.profile);
@@ -84,8 +90,8 @@ const Register = () => {
             setSuccess("Acount Created Successfully")
             navigate("/")
         } catch (error) {
-            if (error.code === "ERR_NETWORK") {
-                setError(error.message)
+            if (error?.code === "ERR_NETWORK") {
+                setError(error?.message)
             } else {
                 console.log(error)
                 setError(error?.response?.data?.error)
@@ -156,8 +162,8 @@ const Register = () => {
                     >
                         Sign Up
                     </Typography>
-                    <FormControl sx={{alignItems: "center"}}>
-                        <Avatar src={imagePreview || undefined} onClick={() => fileInputRef.current?.click()} sx={{height: "100px", width:"100px"}}/>
+                    <FormControl sx={{ alignItems: "center" }}>
+                        <Avatar src={imagePreview || undefined} onClick={() => fileInputRef.current?.click()} sx={{ height: "100px", width: "100px" }} />
                         <input type="file" accept="image/*" ref={fileInputRef} onChange={handleImageChange} hidden />
                     </FormControl>
 
@@ -212,6 +218,23 @@ const Register = () => {
                                 fullWidth
                                 variant="outlined"
                             />
+                        </FormControl>
+
+
+                        <FormControl fullWidth>
+                            <InputLabel id="demo-simple-select-label">Role</InputLabel>
+                            <Select
+                                labelId="demo-simple-select-label"
+                                id="demo-simple-select"
+                                name='role'
+                                value={formData.role}
+                                label="role"
+                                onChange={handleChange}
+
+                            >
+                                <MenuItem value={"User"}>User</MenuItem>
+                                <MenuItem value={"Admin"}>Admin</MenuItem>
+                            </Select>
                         </FormControl>
 
                         <FormControl>

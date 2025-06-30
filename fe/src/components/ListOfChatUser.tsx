@@ -16,6 +16,7 @@ interface Props {
 
 const ListOfChatUser: React.FC<Props> = ({ setSelected, AllUsers, Selected, setSelectedUserData }) => {
     const theme = useTheme();
+
     const [SearchTerm, setSearchTerm] = useState("")
     const [IsLoading, setIsLoading] = useState(false)
     const [FilteredUsers, setFilteredUsers] = useState<any[]>([]);
@@ -41,6 +42,7 @@ const ListOfChatUser: React.FC<Props> = ({ setSelected, AllUsers, Selected, setS
     useEffect(() => {
         searchContacts()
     }, [SearchTerm])
+
     return (
         <Box
             // minHeight="100%"
@@ -82,6 +84,7 @@ const ListOfChatUser: React.FC<Props> = ({ setSelected, AllUsers, Selected, setS
                         Loading...
                     </Typography>
                    </Stack>) : (
+                    
                    (SearchTerm ? FilteredUsers :  AllUsers).map((user) => {
                         return <Paper
                             key={user._id}
